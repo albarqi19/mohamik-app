@@ -1,18 +1,109 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
+import {
+  IBMPlexSansArabic_400Regular,
+  IBMPlexSansArabic_500Medium,
+  IBMPlexSansArabic_600SemiBold,
+  IBMPlexSansArabic_700Bold,
+  useFonts,
+} from '@expo-google-fonts/ibm-plex-sans-arabic';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { I18nManager, Platform, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { AuthProvider, useAuth } from '@/providers/auth-provider';
+import { SettingsProvider } from '@/providers/settings-provider';
+import { AppThemeProvider, fonts, useTheme } from '@/theme';
 
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// التطبيق عربي فقط: نطلب RTL من النظام (يسري من التشغيل التالي في Expo Go).
+// في البناء الفعلي يضبطه إعداد expo-localization (forcesRTL) من أول تشغيل.
+if (Platform.OS !== 'web' && !I18nManager.isRTL) {
+  I18nManager.allowRTL(true);
+  I18nManager.forceRTL(true);
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
+});
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    IBMPlexSansArabic_400Regular,
+    IBMPlexSansArabic_500Medium,
+    IBMPlexSansArabic_600SemiBold,
+    IBMPlexSansArabic_700Bold,
+    Amiri_400Regular,
+    Amiri_700Bold,
+  });
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
+    // direction: 'rtl' يضمن تخطيطاً عربياً حتى قبل أن يسري إعداد RTL في Expo Go
+    <GestureHandlerRootView style={{ flex: 1, direction: 'rtl' }}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <SettingsProvider>
+            <AppThemeProvider>
+              <AuthProvider>{loaded ? <RootNavigator /> : <View style={{ flex: 1 }} />}</AuthProvider>
+            </AppThemeProvider>
+          </SettingsProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+function RootNavigator() {
+  const { status } = useAuth();
+  const { colors, dark } = useTheme();
+
+  useEffect(() => {
+    if (status !== 'loading') void SplashScreen.hideAsync();
+  }, [status]);
+
+  if (status === 'loading') return <View style={{ flex: 1, backgroundColor: colors.background }} />;
+
+  const base = dark ? DarkTheme : DefaultTheme;
+  const navTheme = {
+    ...base,
+    colors: { ...base.colors, background: colors.background, card: colors.surface, text: colors.text, border: colors.border, primary: colors.accent },
+  };
+  const signedIn = status === 'signedIn';
+
+  return (
+    <ThemeProvider value={navTheme}>
+      <StatusBar style={dark ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerTitleStyle: { fontFamily: fonts.semibold, fontSize: 17 },
+          headerTitleAlign: 'center',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerBackButtonDisplayMode: 'minimal',
+          contentStyle: { backgroundColor: colors.background },
+        }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Protected guard={!signedIn}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={signedIn}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="case/new" options={{ title: 'قضية جديدة', presentation: 'modal' }} />
+          <Stack.Screen name="case/[id]/index" options={{ title: '' }} />
+          <Stack.Screen name="case/[id]/hearing/[hearingId]" options={{ title: 'تجهيز الجلسة' }} />
+          <Stack.Screen name="case/[id]/memo/[memoId]" options={{ title: 'المذكرة' }} />
+          <Stack.Screen name="case/[id]/judgment" options={{ title: 'الحكم والاعتراض' }} />
+          <Stack.Screen name="chat" options={{ title: 'اسأل محاميك' }} />
+          <Stack.Screen name="agenda" options={{ title: 'الجلسات والمهل' }} />
+          <Stack.Screen name="notifications" options={{ title: 'الإشعارات' }} />
+        </Stack.Protected>
+      </Stack>
     </ThemeProvider>
   );
 }

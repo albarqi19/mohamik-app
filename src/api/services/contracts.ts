@@ -1,0 +1,64 @@
+import type {
+  AppNotification,
+  AskAssistantInput,
+  AskAssistantResult,
+  AuthSession,
+  Case,
+  CaseSummary,
+  ChatMessage,
+  Deadline,
+  DraftMemoInput,
+  Hearing,
+  ID,
+  Memo,
+  NewCaseInput,
+  OtpRequest,
+  OtpRequestResult,
+  OtpVerify,
+  User,
+} from '../types';
+
+/**
+ * واجهات الخدمات. لكل خدمة تطبيقان: تجريبي (mock) وحقيقي (http).
+ * عند ربط خلفية الرائد يكفي أن تطابق نقاط النهاية المذكورة في http.ts.
+ */
+
+export interface AuthService {
+  requestOtp(input: OtpRequest): Promise<OtpRequestResult>;
+  verifyOtp(input: OtpVerify): Promise<AuthSession>;
+  me(): Promise<User>;
+  logout(): Promise<void>;
+}
+
+export interface CasesService {
+  list(): Promise<CaseSummary[]>;
+  get(id: ID): Promise<Case>;
+  create(input: NewCaseInput): Promise<Case>;
+  toggleNextStep(caseId: ID, stepId: ID): Promise<Case>;
+  toggleHearingPrep(caseId: ID, hearingId: ID, itemId: ID): Promise<Hearing>;
+  upcomingHearings(): Promise<(Hearing & { caseTitle: string })[]>;
+  deadlines(): Promise<Deadline[]>;
+}
+
+export interface MemosService {
+  get(caseId: ID, memoId: ID): Promise<Memo>;
+  draft(input: DraftMemoInput): Promise<Memo>;
+}
+
+export interface AssistantService {
+  history(conversationId?: ID, caseId?: ID): Promise<ChatMessage[]>;
+  ask(input: AskAssistantInput): Promise<AskAssistantResult>;
+}
+
+export interface NotificationsService {
+  list(): Promise<AppNotification[]>;
+  markRead(id: ID): Promise<void>;
+}
+
+export type Api = {
+  auth: AuthService;
+  cases: CasesService;
+  memos: MemosService;
+  assistant: AssistantService;
+  notifications: NotificationsService;
+};
