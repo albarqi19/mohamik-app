@@ -10,6 +10,8 @@ import type {
   DraftMemoInput,
   Hearing,
   ID,
+  CaseDocument,
+  UploadInput,
   IntakeAnswer,
   IntakeTurn,
   LawyerReferral,
@@ -41,6 +43,14 @@ export interface CasesService {
   toggleHearingPrep(caseId: ID, hearingId: ID, itemId: ID): Promise<Hearing>;
   upcomingHearings(): Promise<(Hearing & { caseTitle: string })[]>;
   deadlines(): Promise<Deadline[]>;
+  /** لا تنبيه تصعيدي على مهلة غير مؤكدة: المستخدم يؤكدها هنا */
+  confirmDeadline(caseId: ID, deadlineId: ID): Promise<Deadline>;
+}
+
+export interface DocumentsService {
+  upload(input: UploadInput): Promise<CaseDocument>;
+  /** قراءة المستند وتحويله إلى بيانات (ملخص، طلبات، مهل) */
+  extract(documentId: ID): Promise<CaseDocument>;
 }
 
 export interface IntakeService {
@@ -76,4 +86,5 @@ export type Api = {
   notifications: NotificationsService;
   referrals: ReferralsService;
   intake: IntakeService;
+  documents: DocumentsService;
 };

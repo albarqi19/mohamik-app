@@ -1,6 +1,6 @@
 import { ApiError } from '../client';
 import type { Api } from '../services/contracts';
-import type { Case, CaseSummary, ChatMessage, Citation, Memo } from '../types';
+import type { Case, CaseDocument, CaseSummary, ChatMessage, Citation, Deadline, Memo } from '../types';
 import { stageLabels } from '@/features/labels';
 
 import { intakeNext } from './intake';
@@ -34,6 +34,13 @@ const toSummary = (c: Case): CaseSummary => ({
   updatedAt: c.updatedAt,
   progress: c.progress,
 });
+
+/** كل مهل القضية بلا تكرار (المهلة القادمة + المستخرجة). */
+function allDeadlines(c: Case): Deadline[] {
+  const list = [...(c.deadlines ?? [])];
+  if (c.nextDeadline && !list.some((d) => d.id === c.nextDeadline!.id)) list.unshift(c.nextDeadline);
+  return list;
+}
 
 function findCase(id: string): Case {
   const c = db.cases.find((x) => x.id === id);
@@ -89,6 +96,52 @@ function mockAnswer(message: string, c?: Case): { content: string; citations: Ci
       suffix,
     citations: [],
   };
+}
+
+const DAY_MS = 86400000;
+
+/** قراءة تجريبية: المحرك الحقيقي يستخرج النص (OCR) ثم يحلله. */
+function mockExtraction(c: Case, doc: CaseDocument): CaseDocument['extraction'] & object {
+  const base = Date.now();
+  if (doc.kind === 'judgment') {
+    return {
+      kind: 'judgment',
+      summary: 'صك حكم (قراءة تجريبية): قضت الدائرة بإلزام المدعى عليه بجزء من المطالبة ورفض الباقي.',
+      keyPoints: ['الحكم ابتدائي وقابل للاعتراض', 'منطوق الحكم يحتاج مراجعتك للتأكد من المبالغ'],
+      requests: [],
+      deadlines: [
+        {
+          id: uid('d'),
+          caseId: c.id,
+          title: 'آخر موعد للاعتراض (محسوب من تاريخ الرفع)',
+          dueAt: new Date(base + 30 * DAY_MS).toISOString(),
+          kind: 'appeal',
+          source: 'computed',
+          confirmed: false,
+        },
+      ],
+    };
+  }
+  if (doc.kind === 'minute') {
+    return {
+      kind: 'minute',
+      summary: 'محضر جلسة (قراءة تجريبية): حضر الطرفان، وطلبت الدائرة من المدعي تقديم ما يثبت دعواه، وأُجّلت الجلسة.',
+      keyPoints: ['أُجّلت الجلسة لموعد يحدد لاحقاً', 'المحكمة طلبت مستندات إضافية'],
+      requests: ['تقديم المستندات المؤيدة للدعوى'],
+      deadlines: [
+        {
+          id: uid('d'),
+          caseId: c.id,
+          title: 'تقديم المستندات المطلوبة في المحضر',
+          dueAt: new Date(base + 10 * DAY_MS).toISOString(),
+          kind: 'document',
+          source: 'extracted',
+          confirmed: false,
+        },
+      ],
+    };
+  }
+  return { kind: doc.kind, summary: 'حُفظ المستند في ملف القضية، وسأستعمله في التقييم والمذكرات.', keyPoints: [], requests: [], deadlines: [] };
 }
 
 export const mockApi: Api = {
@@ -188,12 +241,18 @@ export const mockApi: Api = {
     },
     async deadlines() {
       await delay();
-      return clone(
-        db.cases
-          .map((c) => c.nextDeadline)
-          .filter((d): d is NonNullable<typeof d> => !!d)
-          .sort((a, b) => a.dueAt.localeCompare(b.dueAt)),
-      );
+      const all = db.cases.flatMap((c) => allDeadlines(c));
+      const now = Date.now() - 86400000;
+      return clone(all.filter((d) => new Date(d.dueAt).getTime() >= now).sort((a, b) => a.dueAt.localeCompare(b.dueAt)));
+    },
+    async confirmDeadline(caseId, deadlineId) {
+      await delay(200);
+      const c = findCase(caseId);
+      const d = allDeadlines(c).find((x) => x.id === deadlineId);
+      if (!d) throw new ApiError('المهلة غير موجودة', 404);
+      d.confirmed = true;
+      if (c.nextDeadline?.id === deadlineId) c.nextDeadline.confirmed = true;
+      return clone(d);
     },
   },
 
@@ -240,6 +299,42 @@ export const mockApi: Api = {
       list.push(reply);
       db.conversations.set(id, list);
       return { conversationId: id, message: clone(reply) };
+    },
+  },
+
+  documents: {
+    async upload({ caseId, kind, name, mimeType, size }) {
+      await delay(900);
+      const c = findCase(caseId);
+      const doc: CaseDocument = { id: uid('doc'), caseId, kind, name, mimeType, size, createdAt: new Date().toISOString() };
+      c.documents = [doc, ...(c.documents ?? [])];
+      return clone(doc);
+    },
+    async extract(documentId) {
+      await delay(1600);
+      const c = db.cases.find((x) => x.documents?.some((d) => d.id === documentId));
+      const doc = c?.documents?.find((d) => d.id === documentId);
+      if (!c || !doc) throw new ApiError('المستند غير موجود', 404);
+      doc.extraction = mockExtraction(c, doc);
+      const now = new Date().toISOString();
+      c.deadlines = [...(c.deadlines ?? []), ...doc.extraction.deadlines];
+      const soonest = allDeadlines(c).sort((a, b) => a.dueAt.localeCompare(b.dueAt))[0];
+      if (soonest) c.nextDeadline = soonest;
+      if (doc.kind === 'minute') {
+        const hearing = c.hearings.filter((h) => h.status !== 'cancelled').sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))[0];
+        c.minutes.push({
+          id: uid('m'),
+          caseId: c.id,
+          hearingId: hearing?.id ?? '',
+          date: now,
+          summary: doc.extraction.summary,
+          keyPoints: doc.extraction.keyPoints,
+          requestsFromCourt: doc.extraction.requests,
+        });
+      }
+      c.timeline.push({ id: uid('t'), at: now, kind: doc.kind === 'judgment' ? 'judgment' : 'minute', title: `قرأ AI ${doc.name}` });
+      c.updatedAt = now;
+      return clone(doc);
     },
   },
 

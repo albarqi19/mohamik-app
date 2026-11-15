@@ -92,6 +92,9 @@ export type Case = CaseSummary & {
   timeline: TimelineEvent[];
   nextSteps: NextStep[];
   assessment?: CaseAssessment;
+  documents?: CaseDocument[];
+  /** كل المهل، ومنها غير المؤكدة المستخرجة من المحاضر */
+  deadlines?: Deadline[];
 };
 
 /* ---------- تقييم القضية ---------- */
@@ -323,3 +326,38 @@ export type IntakeTurn = {
 };
 
 export type IntakeAnswer = { sessionId?: ID; answer?: string };
+
+/* ---------- المستندات وقراءتها ---------- */
+
+export type DocumentKind = 'minute' | 'judgment' | 'contract' | 'evidence' | 'other';
+
+/** ما استخرجه AI من المستند: ملخص، نقاط، طلبات المحكمة، ومهل مقترحة تحتاج تأكيداً. */
+export type Extraction = {
+  kind: DocumentKind;
+  summary: string;
+  keyPoints: string[];
+  requests: string[];
+  deadlines: Deadline[];
+};
+
+export type CaseDocument = {
+  id: ID;
+  caseId: ID;
+  kind: DocumentKind;
+  name: string;
+  mimeType: string;
+  size?: number;
+  createdAt: ISODate;
+  extraction?: Extraction;
+};
+
+export type UploadInput = {
+  caseId: ID;
+  kind: DocumentKind;
+  uri: string;
+  name: string;
+  mimeType: string;
+  size?: number;
+  /** على الويب: كائن File الأصلي */
+  file?: Blob;
+};

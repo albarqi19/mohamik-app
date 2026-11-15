@@ -3,8 +3,8 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { api } from '@/api';
-import { Badge, Card, EmptyState, Icon, ICON_FORWARD, LoadingView, Screen, SectionHeader, Text } from '@/components/ui';
-import { memoKindLabels, memoStatusLabels } from '@/features/labels';
+import { AIBadge, Badge, Card, EmptyState, Icon, ICON_FORWARD, LoadingView, Screen, SectionHeader, Text } from '@/components/ui';
+import { documentKindLabels, memoKindLabels, memoStatusLabels } from '@/features/labels';
 import { qk, useCases } from '@/features/queries';
 import { formatDate } from '@/lib/format';
 import { useTheme } from '@/theme';
@@ -19,22 +19,50 @@ export default function Documents() {
   const memos = details
     .flatMap((d) => (d.data ? d.data.memos.map((m) => ({ ...m, caseTitle: d.data!.title })) : []))
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const files = details
+    .flatMap((d) => (d.data?.documents ?? []).map((f) => ({ ...f, caseTitle: d.data!.title })))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
     <Screen>
       <Text variant="title">المستندات</Text>
 
-      <Card tone="muted" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <Card tone="muted" onPress={() => router.push('/upload')} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="camera-outline" size={22} />
         </View>
         <View style={{ flex: 1 }}>
           <Text variant="bodyStrong">صوّر محضراً أو حكماً</Text>
           <Text variant="caption" color="textMuted">
-            سأقرؤه وأستخرج المواعيد والمطلوب منك (قريباً)
+            سأقرؤه وأستخرج المواعيد والمطلوب منك
           </Text>
         </View>
       </Card>
+
+      {files.length ? (
+        <>
+          <SectionHeader title="المستندات المرفوعة" />
+          <View style={{ gap: spacing.sm }}>
+            {files.map((f) => (
+              <Card
+                key={f.id}
+                onPress={() => router.push({ pathname: '/case/[id]', params: { id: f.caseId } })}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Icon name={f.mimeType.includes('pdf') ? 'document-outline' : 'image-outline'} size={24} color="accentText" />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text variant="bodyStrong" numberOfLines={1}>
+                    {f.name}
+                  </Text>
+                  <Text variant="caption" color="textMuted">
+                    {documentKindLabels[f.kind]} · {f.caseTitle} · {formatDate(f.createdAt)}
+                  </Text>
+                </View>
+                {f.extraction ? <AIBadge size="sm" /> : null}
+              </Card>
+            ))}
+          </View>
+        </>
+      ) : null}
 
       <SectionHeader title="المذكرات واللوائح" />
       {loading ? (

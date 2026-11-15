@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { api, type Case, type DraftMemoInput, type NewCaseInput } from '@/api';
+import { api, type Case, type DraftMemoInput, type NewCaseInput, type UploadInput } from '@/api';
 
 /** مفاتيح ومكوّنات الاستعلامات (React Query) لكل البيانات. */
 export const qk = {
@@ -78,5 +78,33 @@ export function useDraftMemo() {
   return useMutation({
     mutationFn: (input: DraftMemoInput) => api.memos.draft(input),
     onSuccess: (memo) => void qc.invalidateQueries({ queryKey: qk.case(memo.caseId) }),
+  });
+}
+
+export function useConfirmDeadline(caseId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (deadlineId: string) => api.cases.confirmDeadline(caseId, deadlineId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.case(caseId) });
+      void qc.invalidateQueries({ queryKey: qk.deadlines });
+      void qc.invalidateQueries({ queryKey: qk.cases });
+    },
+  });
+}
+
+/** رفع مستند ثم قراءته في خطوة واحدة. */
+export function useUploadAndExtract() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: UploadInput) => {
+      const doc = await api.documents.upload(input);
+      return api.documents.extract(doc.id);
+    },
+    onSuccess: (doc) => {
+      void qc.invalidateQueries({ queryKey: qk.case(doc.caseId) });
+      void qc.invalidateQueries({ queryKey: qk.deadlines });
+      void qc.invalidateQueries({ queryKey: qk.cases });
+    },
   });
 }

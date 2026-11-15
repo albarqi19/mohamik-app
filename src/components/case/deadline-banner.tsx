@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import type { Deadline } from '@/api/types';
 import { Icon, Text } from '@/components/ui';
@@ -6,7 +6,15 @@ import { daysUnit, daysUntil, formatDate, formatHijri } from '@/lib/format';
 import { useTheme } from '@/theme';
 
 /** تنبيه المهلة: عدّ تنازلي بارز للمهل الحرجة كالاعتراض. */
-export function DeadlineBanner({ deadline }: { deadline: Pick<Deadline, 'title' | 'dueAt' | 'confirmed'> }) {
+export function DeadlineBanner({
+  deadline,
+  onConfirm,
+  confirming,
+}: {
+  deadline: Pick<Deadline, 'title' | 'dueAt' | 'confirmed'>;
+  onConfirm?: () => void;
+  confirming?: boolean;
+}) {
   const { colors, radius } = useTheme();
   const days = daysUntil(deadline.dueAt);
   const urgent = days <= 7;
@@ -37,9 +45,18 @@ export function DeadlineBanner({ deadline }: { deadline: Pick<Deadline, 'title' 
           ينتهي {formatDate(deadline.dueAt)} · {formatHijri(deadline.dueAt)}
         </Text>
         {!deadline.confirmed ? (
-          <Text variant="caption" color="warning">
-            مهلة محسوبة تحتاج تأكيدك
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <Text variant="caption" color="warning">
+              مهلة مستخرجة تحتاج تأكيدك
+            </Text>
+            {onConfirm ? (
+              <Pressable onPress={onConfirm} disabled={confirming} hitSlop={8} accessibilityRole="button">
+                <Text variant="label" color="accentText" style={{ textDecorationLine: 'underline' }}>
+                  {confirming ? 'جارٍ التأكيد...' : 'أكّدها'}
+                </Text>
+              </Pressable>
+            ) : null}
+          </View>
         ) : null}
       </View>
     </View>

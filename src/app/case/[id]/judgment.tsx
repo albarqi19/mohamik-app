@@ -18,7 +18,15 @@ export default function JudgmentScreen() {
   if (isLoading) return <LoadingView />;
   if (error || !c) return <ErrorView message={error?.message} onRetry={refetch} />;
   const j = c.judgment;
-  if (!j) return <EmptyState icon="hammer-outline" title="لم يصدر حكم بعد" body="عند صدور الحكم ارفع صورة الصك وسأحلله لك." />;
+  if (!j)
+    return (
+      <EmptyState
+        icon="hammer-outline"
+        title="لم يصدر حكم بعد"
+        body="عند صدور الحكم ارفع صورة الصك وسأحلله لك وأحسب مهلة الاعتراض."
+        action={{ label: 'ارفع صك الحكم', onPress: () => router.push({ pathname: '/upload', params: { caseId: c.id, kind: 'judgment' } }) }}
+      />
+    );
 
   const appealMemo = c.appeal?.memoId ? c.memos.find((m) => m.id === c.appeal?.memoId) : undefined;
 

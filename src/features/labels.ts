@@ -1,5 +1,6 @@
 import type {
   AppealKind,
+  DocumentKind,
   AppealStatus,
   CaseStage,
   CaseType,
@@ -104,4 +105,12 @@ export const appealStatusLabels: Record<AppealStatus, string> = {
   submitted: 'مقدّم',
   accepted: 'مقبول',
   rejected: 'مرفوض',
+};
+
+export const documentKindLabels: Record<DocumentKind, string> = {
+  minute: 'محضر جلسة',
+  judgment: 'صك حكم',
+  contract: 'عقد',
+  evidence: 'إثبات',
+  other: 'مستند',
 };
