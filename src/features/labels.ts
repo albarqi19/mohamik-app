@@ -4,6 +4,7 @@ import type {
   AppealStatus,
   CaseStage,
   CaseType,
+  DeadlineKind,
   HearingMode,
   HearingStatus,
   JudgmentOutcome,
@@ -113,4 +114,12 @@ export const documentKindLabels: Record<DocumentKind, string> = {
   contract: 'عقد',
   evidence: 'إثبات',
   other: 'مستند',
+};
+
+export const deadlineKindLabels: Record<DeadlineKind, string> = {
+  memo_submission: 'تقديم مذكرة',
+  document: 'تقديم مستند',
+  appeal: 'اعتراض على حكم',
+  hearing: 'متعلقة بجلسة',
+  other: 'أخرى',
 };

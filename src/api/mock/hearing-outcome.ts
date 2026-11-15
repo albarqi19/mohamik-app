@@ -3,7 +3,7 @@ import type { Case, Hearing, HearingOutcomeInput, NextStep } from '../types';
 
 const uid = (p: string) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
 
-const DEFAULT_PREP = [
+export const DEFAULT_PREP = [
   'راجع المحضر السابق وما طلبته المحكمة',
   'جهّز ردك على ما قدمه الطرف الآخر',
   'اجمع المستندات المطلوبة في ملف واحد',
