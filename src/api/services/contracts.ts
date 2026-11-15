@@ -10,6 +10,8 @@ import type {
   DraftMemoInput,
   Hearing,
   ID,
+  IntakeAnswer,
+  IntakeTurn,
   LawyerReferral,
   Memo,
   NewCaseInput,
@@ -41,6 +43,11 @@ export interface CasesService {
   deadlines(): Promise<Deadline[]>;
 }
 
+export interface IntakeService {
+  /** بدون answer يبدأ جلسة جديدة؛ ومع answer يعيد الدور التالي */
+  next(input: IntakeAnswer): Promise<IntakeTurn>;
+}
+
 export interface ReferralsService {
   /** طلب عرض القضية على محامٍ من الرائد */
   request(caseId: ID, note?: string): Promise<LawyerReferral>;
@@ -68,4 +75,5 @@ export type Api = {
   assistant: AssistantService;
   notifications: NotificationsService;
   referrals: ReferralsService;
+  intake: IntakeService;
 };

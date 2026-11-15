@@ -87,7 +87,7 @@ export default function Home() {
             <Text variant="caption" style={{ color: colors.heroMuted }}>
               احكِ لي ما حدث، وسأقيّم موقفك وأرتب معك الخطوات.
             </Text>
-            <Button title="ابدأ قضية جديدة" variant="accent" onPress={() => router.push('/case/new')} />
+            <Button title="احكِ لي قصتك" variant="accent" onPress={() => router.push('/intake')} />
           </>
         )}
       </Card>

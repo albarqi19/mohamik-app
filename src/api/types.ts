@@ -299,3 +299,27 @@ export type NewCaseInput = {
   claimAmount?: number;
   caseNumber?: string;
 };
+
+/* ---------- البداية الذكية (احكِ قصتك) ---------- */
+
+export type IntakeFact = { label: string; value: string };
+
+/** دور واحد في محادثة البداية الذكية: رد AI + ما فهمه + السؤال التالي. */
+export type IntakeTurn = {
+  sessionId: ID;
+  /** رسائل AI لهذا الدور (قد تكون أكثر من رسالة) */
+  messages: string[];
+  /** الوقائع المستخرجة حتى الآن، يراها المستخدم ويصححها */
+  facts: IntakeFact[];
+  /** نصيحة عملية قصيرة (مثل: احتفظ برسالة الإنهاء) */
+  tip?: string;
+  /** خيارات جاهزة للرد بلمسة */
+  options?: string[];
+  step: number;
+  totalSteps: number;
+  /** عند الاكتمال: مسودة القضية جاهزة للإنشاء */
+  done: boolean;
+  draft?: NewCaseInput;
+};
+
+export type IntakeAnswer = { sessionId?: ID; answer?: string };

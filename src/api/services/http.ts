@@ -39,6 +39,9 @@ export const httpApi: Api = {
       return http(v1(`/ai/conversations/${id}/messages`), { method: 'POST', body: { content: message } });
     },
   },
+  intake: {
+    next: (body) => http(v1('/intake/turns'), { method: 'POST', body }),
+  },
   referrals: {
     request: (caseId, note) => http(v1(`/cases/${caseId}/referrals`), { method: 'POST', body: { note } }),
   },

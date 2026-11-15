@@ -30,7 +30,7 @@ export default function Cases() {
       <View style={{ padding: spacing.lg, gap: spacing.md }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text variant="title">قضاياي</Text>
-          <Button title="قضية جديدة" icon="add" size="sm" onPress={() => router.push('/case/new')} />
+          <Button title="قضية جديدة" icon="add" size="sm" onPress={() => router.push('/intake')} />
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           {FILTERS.map((f) => {
@@ -74,7 +74,7 @@ export default function Cases() {
               icon="briefcase-outline"
               title="لا توجد قضايا هنا"
               body="ابدأ بإضافة قضيتك، وسأرشدك خطوة بخطوة."
-              action={{ label: 'قضية جديدة', onPress: () => router.push('/case/new') }}
+              action={{ label: 'احكِ لي قصتك', onPress: () => router.push('/intake') }}
             />
           }
         />
