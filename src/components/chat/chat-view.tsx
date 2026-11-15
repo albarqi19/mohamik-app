@@ -88,6 +88,7 @@ export function ChatView({ caseId, caseTitle, header, mode = 'general' }: Props)
                 {!caseId ? (
                   <Pressable
                     onPress={() => router.push('/intake')}
+                    accessibilityRole="button"
                     style={({ pressed }) => ({
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -114,6 +115,7 @@ export function ChatView({ caseId, caseTitle, header, mode = 'general' }: Props)
                     <Pressable
                       key={s}
                       onPress={() => send(s)}
+                      accessibilityRole="button"
                       style={({ pressed }) => ({
                         borderWidth: 1,
                         borderColor: colors.border,
@@ -167,6 +169,7 @@ export function ChatView({ caseId, caseTitle, header, mode = 'general' }: Props)
           onPress={() => send(input)}
           disabled={!input.trim() || ask.isPending}
           accessibilityLabel="إرسال"
+          accessibilityRole="button"
           style={{
             width: 44,
             height: 44,

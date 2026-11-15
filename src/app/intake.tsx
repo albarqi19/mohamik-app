@@ -72,7 +72,7 @@ export default function Intake() {
         options={{
           title: 'قضية جديدة',
           headerRight: () => (
-            <Pressable onPress={() => router.replace('/case/new')} hitSlop={10} style={{ paddingHorizontal: 8 }}>
+            <Pressable onPress={() => router.replace('/case/new')} hitSlop={10} accessibilityRole="button" style={{ paddingHorizontal: 8 }}>
               <Text variant="label" color="accentText">
                 إدخال يدوي
               </Text>
