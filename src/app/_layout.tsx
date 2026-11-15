@@ -1,4 +1,3 @@
-import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import {
   IBMPlexSansArabic_400Regular,
   IBMPlexSansArabic_500Medium,
@@ -38,8 +37,6 @@ export default function RootLayout() {
     IBMPlexSansArabic_500Medium,
     IBMPlexSansArabic_600SemiBold,
     IBMPlexSansArabic_700Bold,
-    Amiri_400Regular,
-    Amiri_700Bold,
   });
 
   return (
