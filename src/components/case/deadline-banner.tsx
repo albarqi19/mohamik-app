@@ -21,7 +21,7 @@ export function DeadlineBanner({ deadline }: { deadline: Pick<Deadline, 'title' 
         gap: 14,
       }}>
       <View style={{ alignItems: 'center', minWidth: 56 }}>
-        <Text variant="display" color={urgent ? 'danger' : 'warning'} align="center" style={{ fontFamily: undefined, fontWeight: '700', lineHeight: 36 }}>
+        <Text variant="display" color={urgent ? 'danger' : 'warning'} align="center" style={{ lineHeight: 36 }}>
           {Math.max(days, 0)}
         </Text>
         <Text variant="label" color={urgent ? 'danger' : 'warning'} align="center">

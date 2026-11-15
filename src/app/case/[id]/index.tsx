@@ -136,7 +136,7 @@ export default function CaseDetail() {
               tone={c.judgment.outcome === 'in_favor' ? 'success' : c.judgment.outcome === 'against' ? 'danger' : 'warning'}
             />
           </View>
-          <Text variant="serif">{c.judgment.summary}</Text>
+          <Text variant="reading">{c.judgment.summary}</Text>
           <Text variant="caption" color="textMuted">
             صدر {formatDate(c.judgment.issuedAt)}
           </Text>
@@ -205,7 +205,7 @@ function MinutesSection({ c }: { c: Case }) {
             <Text variant="bodyStrong">محضر {formatDate(m.date)}</Text>
             <AIBadge size="sm" />
           </View>
-          <Text variant="serif" style={{ fontSize: 16, lineHeight: 30 }}>
+          <Text variant="reading">
             {m.summary}
           </Text>
           <Text variant="label" color="textMuted">

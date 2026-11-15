@@ -30,7 +30,7 @@ export default function JudgmentScreen() {
           </Text>
           <Badge label={outcomeLabels[j.outcome]} tone={j.outcome === 'in_favor' ? 'success' : j.outcome === 'against' ? 'danger' : 'warning'} />
         </View>
-        <Text variant="serif" style={{ fontSize: 19, lineHeight: 34 }}>
+        <Text variant="reading" style={{ fontSize: 18, lineHeight: 31 }}>
           {j.summary}
         </Text>
         <Text variant="caption" color="textMuted">

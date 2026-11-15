@@ -135,15 +135,13 @@ export const fonts = {
   medium: 'IBMPlexSansArabic_500Medium',
   semibold: 'IBMPlexSansArabic_600SemiBold',
   bold: 'IBMPlexSansArabic_700Bold',
-  /** للعناوين ونصوص المذكرات والمواد النظامية */
-  serif: 'Amiri_400Regular',
-  serifBold: 'Amiri_700Bold',
 } as const;
 
 export const typography = {
-  display: { fontFamily: fonts.serifBold, fontSize: 28, lineHeight: 46 },
-  title: { fontFamily: fonts.serifBold, fontSize: 24, lineHeight: 40 },
-  serif: { fontFamily: fonts.serif, fontSize: 17, lineHeight: 32 },
+  display: { fontFamily: fonts.bold, fontSize: 28, lineHeight: 42 },
+  title: { fontFamily: fonts.bold, fontSize: 22, lineHeight: 34 },
+  /** نصوص المذكرات والأحكام والمواد النظامية: أكبر قليلاً وبتباعد أسطر مريح للقراءة */
+  reading: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 29 },
   heading: { fontFamily: fonts.semibold, fontSize: 18, lineHeight: 28 },
   body: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 25 },
   bodyStrong: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 24 },

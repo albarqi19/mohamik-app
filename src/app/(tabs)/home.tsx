@@ -64,7 +64,7 @@ export default function Home() {
         </View>
         {nextHearing ? (
           <>
-            <Text style={{ fontFamily: fonts.serifBold, fontSize: 22, lineHeight: 36, color: colors.heroText }}>
+            <Text style={{ fontFamily: fonts.bold, fontSize: 21, lineHeight: 32, color: colors.heroText }}>
               استعد للجلسة {relativeDays(nextHearing.scheduledAt)}
             </Text>
             <Text variant="caption" style={{ color: colors.heroMuted }}>
@@ -81,7 +81,7 @@ export default function Home() {
           </>
         ) : (
           <>
-            <Text style={{ fontFamily: fonts.serifBold, fontSize: 22, lineHeight: 36, color: colors.heroText }}>
+            <Text style={{ fontFamily: fonts.bold, fontSize: 21, lineHeight: 32, color: colors.heroText }}>
               عندك قضية أو استفسار؟
             </Text>
             <Text variant="caption" style={{ color: colors.heroMuted }}>

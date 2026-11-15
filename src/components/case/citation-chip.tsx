@@ -29,7 +29,7 @@ export function CitationChip({ citation }: { citation: Citation }) {
         </Text>
       </View>
       {open && citation.excerpt ? (
-        <Text variant="serif" style={{ fontSize: 15, lineHeight: 28 }}>
+        <Text variant="reading" style={{ fontSize: 14, lineHeight: 25 }}>
           {citation.excerpt}
         </Text>
       ) : null}

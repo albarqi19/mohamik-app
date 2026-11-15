@@ -22,10 +22,10 @@ export default function Welcome() {
       <SafeAreaView style={{ flex: 1, padding: spacing.xl, justifyContent: 'space-between' }}>
         <View style={{ gap: spacing.md, marginTop: spacing.xxl }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Text style={{ fontFamily: fonts.serifBold, fontSize: 40, lineHeight: 64, color: colors.heroText }}>محاميك</Text>
+            <Text style={{ fontFamily: fonts.bold, fontSize: 38, lineHeight: 54, color: colors.heroText }}>محاميك</Text>
             <AIBadge size="lg" />
           </View>
-          <Text style={{ fontFamily: fonts.serif, fontSize: 20, lineHeight: 36, color: colors.heroMuted }}>
+          <Text style={{ fontFamily: fonts.regular, fontSize: 18, lineHeight: 30, color: colors.heroMuted }}>
             محامٍ ذكي في جيبك، يتابع قضيتك من أول سؤال حتى آخر حكم.
           </Text>
         </View>

@@ -43,7 +43,7 @@ export default function MemoScreen() {
       </View>
 
       <Card style={{ gap: spacing.md }}>
-        <Text variant="serif">{m.body}</Text>
+        <Text variant="reading">{m.body}</Text>
       </Card>
 
       {m.citations.length ? (
