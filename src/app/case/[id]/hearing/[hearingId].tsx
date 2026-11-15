@@ -102,7 +102,7 @@ export default function HearingPrep() {
         <Button
           title="تدرّب على الجلسة"
           variant="secondary"
-          onPress={() => router.push({ pathname: '/chat', params: { caseId: c.id, title: c.title } })}
+          onPress={() => router.push({ pathname: '/chat', params: { caseId: c.id, title: c.title, mode: 'practice' } })}
         />
       </Card>
     </Screen>

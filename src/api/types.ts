@@ -263,10 +263,14 @@ export type ChatMessage = {
   pending?: boolean;
 };
 
+/** general: سؤال عام أو عن القضية. practice: تدريب على الجلسة، AI يؤدي دور القاضي. */
+export type AssistantMode = 'general' | 'practice';
+
 export type AskAssistantInput = {
   caseId?: ID;
   conversationId?: ID;
   message: string;
+  mode?: AssistantMode;
 };
 
 export type AskAssistantResult = {

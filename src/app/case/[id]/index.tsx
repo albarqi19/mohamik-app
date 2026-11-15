@@ -54,6 +54,7 @@ export default function CaseDetail() {
       case 'draft_appeal': {
         const m = c.memos.find((x) => x.status !== 'submitted');
         if (m) router.push({ pathname: '/case/[id]/memo/[memoId]', params: { id: c.id, memoId: m.id } });
+        else router.push({ pathname: '/case/[id]/memo/new', params: { id: c.id, kind: step.action === 'draft_appeal' ? 'appeal' : 'statement_of_claim' } });
         break;
       }
       case 'upload_document':
@@ -274,6 +275,12 @@ function MinutesSection({ c }: { c: Case }) {
 function MemosSection({ c }: { c: Case }) {
   return (
     <View style={{ gap: 10 }}>
+      <Button
+        title="صياغة مذكرة جديدة"
+        icon="create-outline"
+        variant="secondary"
+        onPress={() => router.push({ pathname: '/case/[id]/memo/new', params: { id: c.id } })}
+      />
       {c.memos.map((m) => (
         <Card
           key={m.id}
