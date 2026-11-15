@@ -5,15 +5,8 @@ import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { api } from '@/api';
 import { ApiError } from '@/api/client';
 import { Button, Text, TextField } from '@/components/ui';
+import { normalizePhone } from '@/lib/phone';
 import { useTheme } from '@/theme';
-
-/** يقبل 05xxxxxxxx أو 5xxxxxxxx أو +9665xxxxxxxx ويحوّل الأرقام العربية. */
-export function normalizePhone(input: string): string {
-  const latin = input.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/\D/g, '');
-  if (latin.startsWith('9665')) return '0' + latin.slice(3);
-  if (latin.startsWith('5') && latin.length === 9) return '0' + latin;
-  return latin;
-}
 
 export default function Login() {
   const { spacing } = useTheme();

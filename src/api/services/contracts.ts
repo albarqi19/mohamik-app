@@ -10,6 +10,7 @@ import type {
   DraftMemoInput,
   Hearing,
   ID,
+  LawyerReferral,
   Memo,
   NewCaseInput,
   OtpRequest,
@@ -40,6 +41,11 @@ export interface CasesService {
   deadlines(): Promise<Deadline[]>;
 }
 
+export interface ReferralsService {
+  /** طلب عرض القضية على محامٍ من الرائد */
+  request(caseId: ID, note?: string): Promise<LawyerReferral>;
+}
+
 export interface MemosService {
   get(caseId: ID, memoId: ID): Promise<Memo>;
   draft(input: DraftMemoInput): Promise<Memo>;
@@ -61,4 +67,5 @@ export type Api = {
   memos: MemosService;
   assistant: AssistantService;
   notifications: NotificationsService;
+  referrals: ReferralsService;
 };

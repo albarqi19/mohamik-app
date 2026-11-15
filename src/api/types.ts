@@ -91,6 +91,38 @@ export type Case = CaseSummary & {
   appeal?: Appeal;
   timeline: TimelineEvent[];
   nextSteps: NextStep[];
+  assessment?: CaseAssessment;
+};
+
+/* ---------- تقييم القضية ---------- */
+
+export type ClaimItem = { label: string; amount: number };
+
+/** تقييم أولي لموقف المستخدم، مبني على الأنظمة والسوابق. */
+export type CaseAssessment = {
+  /** قوة الموقف من 100 */
+  score: number;
+  headline: string;
+  strengths: string[];
+  needsEvidence: string[];
+  claims: ClaimItem[];
+  /** الأساس الذي بني عليه الحساب، مثل: راتب 8,000 وعقد غير محدد المدة */
+  basis?: string;
+  citations: Citation[];
+  beforeYouStart?: string;
+  /** الحالات المعقدة أو قليلة الثقة: نقترح عرضها على محامٍ من الرائد */
+  recommendLawyer: boolean;
+  generatedAt: ISODate;
+};
+
+/* ---------- التحويل لمحامٍ من الرائد ---------- */
+
+export type LawyerReferral = {
+  id: ID;
+  caseId: ID;
+  status: 'requested' | 'assigned' | 'closed';
+  createdAt: ISODate;
+  note?: string;
 };
 
 /* ---------- الجلسات والمحاضر والمذكرات ---------- */

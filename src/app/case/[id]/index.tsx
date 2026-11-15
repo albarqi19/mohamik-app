@@ -4,7 +4,9 @@ import { Pressable, View } from 'react-native';
 
 import type { Case, NextStep } from '@/api/types';
 import { DeadlineBanner } from '@/components/case/deadline-banner';
+import { LawyerReferral } from '@/components/case/lawyer-referral';
 import { NextStepItem } from '@/components/case/next-step-item';
+import { ScoreRing } from '@/components/case/score-ring';
 import { StageTracker } from '@/components/case/stage-tracker';
 import { AIBadge, Badge, Button, Card, ErrorView, Icon, ICON_FORWARD, LoadingView, Screen, Text } from '@/components/ui';
 import {
@@ -91,6 +93,19 @@ export default function CaseDetail() {
 
       {c.nextDeadline ? <DeadlineBanner deadline={c.nextDeadline} /> : null}
 
+      {c.assessment ? (
+        <Card onPress={() => router.push({ pathname: '/case/[id]/assessment', params: { id: c.id } })} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <ScoreRing score={c.assessment.score} size={64} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="label" color="textMuted">
+              تقييم موقفك
+            </Text>
+            <Text variant="bodyStrong">{c.assessment.headline}</Text>
+          </View>
+          <Icon name={ICON_FORWARD} size={18} color="textMuted" />
+        </Card>
+      ) : null}
+
       {/* الخطوات التالية */}
       <Card style={{ gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -166,6 +181,8 @@ export default function CaseDetail() {
       {section === 'minutes' ? <MinutesSection c={c} /> : null}
       {section === 'memos' ? <MemosSection c={c} /> : null}
       {section === 'timeline' ? <TimelineSection c={c} /> : null}
+
+      <LawyerReferral caseId={c.id} />
     </Screen>
   );
 }

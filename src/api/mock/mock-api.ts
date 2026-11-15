@@ -136,7 +136,21 @@ export const mockApi: Api = {
         hearings: [],
         minutes: [],
         memos: [],
-        timeline: [{ id: uid('t'), at: now, kind: 'created', title: 'أنشأت القضية في محاميك' }],
+        timeline: [
+          { id: uid('t'), at: now, kind: 'created', title: 'أنشأت القضية في محاميك' },
+          { id: uid('t'), at: now, kind: 'note', title: 'جهّز AI تقييماً أولياً لموقفك' },
+        ],
+        assessment: {
+          score: 60,
+          headline: 'تقييم أولي، ويتضح أكثر مع المستندات',
+          strengths: ['وقائعك واضحة ومرتبة'],
+          needsEvidence: ['المستندات التي تثبت ما ذكرته (عقد، مراسلات، إيصالات)'],
+          claims: input.claimAmount ? [{ label: 'المبلغ المطالب به', amount: input.claimAmount }] : [],
+          citations: [],
+          beforeYouStart: 'ارفع ما لديك من مستندات، وسأعيد التقييم بدقة أعلى.',
+          recommendLawyer: input.type === 'criminal' || input.type === 'administrative',
+          generatedAt: now,
+        },
         nextSteps: [
           { id: uid('s'), title: 'ارفع المستندات الأساسية', detail: 'العقود والمراسلات وأي إثباتات لديك.', action: 'upload_document', done: false },
           { id: uid('s'), title: 'دع AI يصوغ صحيفة الدعوى', detail: 'مبنية على وقائعك والأنظمة ذات الصلة.', action: 'draft_memo', done: false },
@@ -225,6 +239,16 @@ export const mockApi: Api = {
       list.push(reply);
       db.conversations.set(id, list);
       return { conversationId: id, message: clone(reply) };
+    },
+  },
+
+  referrals: {
+    async request(caseId, note) {
+      await delay(800);
+      const c = findCase(caseId);
+      const now = new Date().toISOString();
+      c.timeline.push({ id: uid('t'), at: now, kind: 'note', title: 'طلبت عرض القضية على محامٍ من الرائد' });
+      return { id: uid('ref'), caseId, status: 'requested', createdAt: now, note };
     },
   },
 

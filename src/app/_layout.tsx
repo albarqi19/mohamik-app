@@ -96,6 +96,7 @@ function RootNavigator() {
           <Stack.Screen name="case/[id]/hearing/[hearingId]" options={{ title: 'تجهيز الجلسة' }} />
           <Stack.Screen name="case/[id]/memo/[memoId]" options={{ title: 'المذكرة' }} />
           <Stack.Screen name="case/[id]/judgment" options={{ title: 'الحكم والاعتراض' }} />
+          <Stack.Screen name="case/[id]/assessment" options={{ title: 'تقييم القضية' }} />
           <Stack.Screen name="chat" options={{ title: 'اسأل محاميك' }} />
           <Stack.Screen name="agenda" options={{ title: 'الجلسات والمهل' }} />
           <Stack.Screen name="notifications" options={{ title: 'الإشعارات' }} />

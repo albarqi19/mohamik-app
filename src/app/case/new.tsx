@@ -38,7 +38,7 @@ export default function NewCase() {
   const submit = async () => {
     const c = await create.mutateAsync(form as NewCaseInput);
     router.dismiss();
-    router.push({ pathname: '/case/[id]', params: { id: c.id } });
+    router.push({ pathname: '/case/[id]/assessment', params: { id: c.id } });
   };
 
   return (
