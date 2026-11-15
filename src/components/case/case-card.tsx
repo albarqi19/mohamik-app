@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import type { CaseSummary } from '@/api/types';
 import { Badge, Card, Icon, Text } from '@/components/ui';
 import { caseTypeLabels, roleLabels, stageLabels } from '@/features/labels';
-import { daysUntil, formatWeekdayTime, relativeDays } from '@/lib/format';
+import { daysUntil, formatWeekdayTime, isPast, relativeDays } from '@/lib/format';
 import { StageTracker } from './stage-tracker';
 
 export function CaseCard({ item }: { item: CaseSummary }) {
@@ -27,12 +27,21 @@ export function CaseCard({ item }: { item: CaseSummary }) {
       {item.nextHearingAt || item.nextDeadline ? (
         <View style={{ gap: 6 }}>
           {item.nextHearingAt ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Icon name="calendar-outline" size={16} color="textMuted" />
-              <Text variant="caption" color="textMuted">
-                الجلسة القادمة: {formatWeekdayTime(item.nextHearingAt)} ({relativeDays(item.nextHearingAt)})
-              </Text>
-            </View>
+            isPast(item.nextHearingAt) ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Icon name="chatbubble-ellipses-outline" size={16} color="accentText" />
+                <Text variant="caption" color="accentText">
+                  جلسة {relativeDays(item.nextHearingAt)}: أخبرني بما جرى
+                </Text>
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Icon name="calendar-outline" size={16} color="textMuted" />
+                <Text variant="caption" color="textMuted">
+                  الجلسة القادمة: {formatWeekdayTime(item.nextHearingAt)} ({relativeDays(item.nextHearingAt)})
+                </Text>
+              </View>
+            )
           ) : null}
           {item.nextDeadline ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
