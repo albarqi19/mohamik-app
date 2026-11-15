@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import { FlatList, I18nManager, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 
 import { api, type ChatMessage } from '@/api';
 import { CitationChip } from '@/components/case/citation-chip';
-import { AIBadge, Icon, Text } from '@/components/ui';
+import { AIBadge, Icon, ICON_FORWARD, Text } from '@/components/ui';
 import { fonts, useTheme } from '@/theme';
 
 const GENERAL_SUGGESTIONS = [
@@ -74,6 +75,30 @@ export function ChatView({ caseId, caseTitle, header }: Props) {
                     ? `أعرف تفاصيل "${caseTitle}" ومحاضرها ومذكراتها، فاسألني مباشرة.`
                     : 'اشرح موقفك بكلماتك، وسأجيبك بالسند النظامي والخطوات العملية.'}
                 </Text>
+                {!caseId ? (
+                  <Pressable
+                    onPress={() => router.push('/intake')}
+                    style={({ pressed }) => ({
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 12,
+                      backgroundColor: colors.primary,
+                      borderRadius: radius.lg,
+                      padding: 14,
+                      opacity: pressed ? 0.85 : 1,
+                    })}>
+                    <Icon name="chatbubbles-outline" size={22} rawColor={colors.primaryText} />
+                    <View style={{ flex: 1 }}>
+                      <Text variant="bodyStrong" style={{ color: colors.primaryText }}>
+                        عندك قضية؟ احكِ لي قصتك
+                      </Text>
+                      <Text variant="caption" style={{ color: colors.primaryText, opacity: 0.8 }}>
+                        أسألك وأرتّب ملف قضيتك وأقيّم موقفك
+                      </Text>
+                    </View>
+                    <Icon name={ICON_FORWARD} size={18} rawColor={colors.primaryText} />
+                  </Pressable>
+                ) : null}
                 <View style={{ gap: 8 }}>
                   {suggestions.map((s) => (
                     <Pressable

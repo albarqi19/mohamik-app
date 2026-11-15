@@ -3,6 +3,7 @@ import type { Api } from '../services/contracts';
 import type { Case, CaseSummary, ChatMessage, Citation, Memo } from '../types';
 import { stageLabels } from '@/features/labels';
 
+import { intakeNext } from './intake';
 import { buildMockCases, buildMockNotifications, citations } from './data';
 
 /** تطبيق تجريبي يعمل في الذاكرة، يحاكي زمن الشبكة. */
@@ -239,6 +240,13 @@ export const mockApi: Api = {
       list.push(reply);
       db.conversations.set(id, list);
       return { conversationId: id, message: clone(reply) };
+    },
+  },
+
+  intake: {
+    async next({ sessionId, answer }) {
+      await delay(answer ? 900 : 200);
+      return intakeNext(sessionId, answer);
     },
   },
 
