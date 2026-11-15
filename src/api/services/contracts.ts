@@ -9,6 +9,7 @@ import type {
   Deadline,
   DraftMemoInput,
   Hearing,
+  HearingOutcomeInput,
   ID,
   CaseDocument,
   UploadInput,
@@ -42,6 +43,9 @@ export interface CasesService {
   toggleNextStep(caseId: ID, stepId: ID): Promise<Case>;
   toggleHearingPrep(caseId: ID, hearingId: ID, itemId: ID): Promise<Hearing>;
   upcomingHearings(): Promise<(Hearing & { caseTitle: string })[]>;
+  /** جلسات مضى موعدها ولم يسجل المستخدم ما جرى فيها */
+  awaitingOutcome(): Promise<(Hearing & { caseTitle: string })[]>;
+  recordHearingOutcome(caseId: ID, hearingId: ID, input: HearingOutcomeInput): Promise<Case>;
   deadlines(): Promise<Deadline[]>;
   /** لا تنبيه تصعيدي على مهلة غير مؤكدة: المستخدم يؤكدها هنا */
   confirmDeadline(caseId: ID, deadlineId: ID): Promise<Deadline>;

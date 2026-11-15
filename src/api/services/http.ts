@@ -22,6 +22,8 @@ export const httpApi: Api = {
     toggleHearingPrep: (_caseId, hearingId, itemId) =>
       http(v1(`/hearings/${hearingId}/prepare/items/${itemId}/toggle`), { method: 'POST' }),
     upcomingHearings: () => http(v1('/agenda'), { query: { type: 'hearings' } }),
+    awaitingOutcome: () => http(v1('/agenda'), { query: { type: 'awaiting_outcome' } }),
+    recordHearingOutcome: (_caseId, hearingId, body) => http(v1(`/hearings/${hearingId}/outcome`), { method: 'POST', body }),
     deadlines: () => http(v1('/deadlines'), { query: { range: 'upcoming' } }),
     confirmDeadline: (_caseId, deadlineId) => http(v1(`/deadlines/${deadlineId}/confirm`), { method: 'POST' }),
   },

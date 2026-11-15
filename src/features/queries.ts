@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { api, type Case, type DraftMemoInput, type NewCaseInput, type UploadInput } from '@/api';
+import { api, type Case, type DraftMemoInput, type HearingOutcomeInput, type NewCaseInput, type UploadInput } from '@/api';
 
 /** مفاتيح ومكوّنات الاستعلامات (React Query) لكل البيانات. */
 export const qk = {
@@ -8,6 +8,7 @@ export const qk = {
   case: (id: string) => ['cases', id] as const,
   memo: (caseId: string, memoId: string) => ['cases', caseId, 'memos', memoId] as const,
   hearings: ['hearings', 'upcoming'] as const,
+  awaitingOutcome: ['hearings', 'awaiting'] as const,
   deadlines: ['deadlines'] as const,
   notifications: ['notifications'] as const,
 };
@@ -17,6 +18,7 @@ export const useCase = (id: string) => useQuery({ queryKey: qk.case(id), queryFn
 export const useMemo_ = (caseId: string, memoId: string) =>
   useQuery({ queryKey: qk.memo(caseId, memoId), queryFn: () => api.memos.get(caseId, memoId) });
 export const useUpcomingHearings = () => useQuery({ queryKey: qk.hearings, queryFn: api.cases.upcomingHearings });
+export const useAwaitingOutcome = () => useQuery({ queryKey: qk.awaitingOutcome, queryFn: api.cases.awaitingOutcome });
 export const useDeadlines = () => useQuery({ queryKey: qk.deadlines, queryFn: api.cases.deadlines });
 export const useNotifications = () => useQuery({ queryKey: qk.notifications, queryFn: api.notifications.list });
 
@@ -89,6 +91,19 @@ export function useConfirmDeadline(caseId: string) {
       void qc.invalidateQueries({ queryKey: qk.case(caseId) });
       void qc.invalidateQueries({ queryKey: qk.deadlines });
       void qc.invalidateQueries({ queryKey: qk.cases });
+    },
+  });
+}
+
+export function useRecordHearingOutcome(caseId: string, hearingId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: HearingOutcomeInput) => api.cases.recordHearingOutcome(caseId, hearingId, input),
+    onSuccess: (c) => {
+      qc.setQueryData(qk.case(caseId), c);
+      void qc.invalidateQueries({ queryKey: qk.cases });
+      void qc.invalidateQueries({ queryKey: ['hearings'] });
+      void qc.invalidateQueries({ queryKey: qk.deadlines });
     },
   });
 }

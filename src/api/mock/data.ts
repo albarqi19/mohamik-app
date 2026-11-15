@@ -281,7 +281,7 @@ export function buildMockCases(): Case[] {
       userRole: 'plaintiff',
       court: { name: 'محكمة الأحوال الشخصية بالدمام', city: 'الدمام' },
       opponentName: 'الطرف الآخر',
-      nextHearingAt: at(12, 11),
+      nextHearingAt: at(-1, 11),
       updatedAt: at(-4),
       progress: 0.2,
       description: 'طلب تقدير نفقة للأبناء وتنظيم الزيارة.',
@@ -295,7 +295,7 @@ export function buildMockCases(): Case[] {
           id: 'h-31',
           caseId: 'case-3',
           number: 1,
-          scheduledAt: at(12, 11),
+          scheduledAt: at(-1, 11),
           mode: 'remote',
           status: 'scheduled',
           agenda: 'الجلسة الأولى: سماع الدعوى',
@@ -309,7 +309,7 @@ export function buildMockCases(): Case[] {
       memos: [],
       timeline: [{ id: 't-31', at: at(-4), kind: 'filed', title: 'قُيدت الدعوى' }],
       nextSteps: [
-        { id: 's-31', title: 'جهّز مستندات الجلسة الأولى', detail: 'مستندان مطلوبان.', dueAt: at(11), action: 'prepare_hearing', done: false },
+        { id: 's-31', title: 'أخبرني بما جرى في الجلسة الأولى', detail: 'حتى أرتب لك الخطوة التالية.', action: 'record_outcome', done: false },
       ],
     },
     {
