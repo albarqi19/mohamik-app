@@ -1,9 +1,15 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
+import type { AssistantMode } from '@/api';
 import { ChatView } from '@/components/chat/chat-view';
 
-/** محادثة مرتبطة بقضية معيّنة، تُفتح من صفحة القضية. */
+/** محادثة مرتبطة بقضية معيّنة، أو تدريب على الجلسة (mode=practice). */
 export default function CaseChat() {
-  const { caseId, title } = useLocalSearchParams<{ caseId?: string; title?: string }>();
-  return <ChatView caseId={caseId} caseTitle={title} />;
+  const { caseId, title, mode } = useLocalSearchParams<{ caseId?: string; title?: string; mode?: AssistantMode }>();
+  return (
+    <>
+      {mode === 'practice' ? <Stack.Screen options={{ title: 'تدرّب على الجلسة' }} /> : null}
+      <ChatView caseId={caseId} caseTitle={title} mode={mode} />
+    </>
+  );
 }

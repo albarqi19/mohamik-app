@@ -104,3 +104,28 @@ describe('documents', () => {
     expect(days).toBe(30);
   });
 });
+
+describe('assistant practice mode', () => {
+  test('plays the judge: asks, gives feedback, and ends', async () => {
+    let r = await mockApi.assistant.ask({ caseId: 'case-1', message: 'ابدأ التدريب', mode: 'practice' });
+    expect(r.message.content).toContain('القاضي:');
+    const id = r.conversationId;
+    for (let i = 0; i < 3; i++) {
+      r = await mockApi.assistant.ask({ caseId: 'case-1', conversationId: id, message: 'إجابة', mode: 'practice' });
+      expect(r.message.content).toContain('ملاحظة');
+      expect(r.message.content).toContain('القاضي:');
+    }
+    r = await mockApi.assistant.ask({ caseId: 'case-1', conversationId: id, message: 'إجابتي الأخيرة مفصلة وفيها التاريخ والمستند رقم 3', mode: 'practice' });
+    expect(r.message.content).toContain('انتهى التدريب');
+  });
+});
+
+describe('memo drafting', () => {
+  test('drafts a memo of the requested kind and attaches it to the case', async () => {
+    const memo = await mockApi.memos.draft({ caseId: 'case-3', kind: 'reply', instructions: 'ركّز على المصاريف' });
+    expect(memo.title).toContain('مذكرة جوابية');
+    expect(memo.body).toContain('ركّز على المصاريف');
+    const c = await mockApi.cases.get('case-3');
+    expect(c.memos[0].id).toBe(memo.id);
+  });
+});

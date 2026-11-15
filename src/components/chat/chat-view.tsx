@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlatList, I18nManager, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 
-import { api, type ChatMessage } from '@/api';
+import { api, type AssistantMode, type ChatMessage } from '@/api';
 import { CitationChip } from '@/components/case/citation-chip';
 import { AIBadge, Icon, ICON_FORWARD, Text } from '@/components/ui';
 import { fonts, useTheme } from '@/theme';
@@ -17,9 +17,9 @@ const GENERAL_SUGGESTIONS = [
 
 const CASE_SUGGESTIONS = ['لخص لي القضية', 'كيف أستعد للجلسة القادمة؟', 'هل أعترض على الحكم؟', 'ما نقاط القوة في موقفي؟'];
 
-type Props = { caseId?: string; caseTitle?: string; header?: React.ReactNode };
+type Props = { caseId?: string; caseTitle?: string; header?: React.ReactNode; mode?: AssistantMode };
 
-export function ChatView({ caseId, caseTitle, header }: Props) {
+export function ChatView({ caseId, caseTitle, header, mode = 'general' }: Props) {
   const { colors, radius, spacing } = useTheme();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -27,7 +27,7 @@ export function ChatView({ caseId, caseTitle, header }: Props) {
   const listRef = useRef<FlatList<ChatMessage>>(null);
 
   const ask = useMutation({
-    mutationFn: (message: string) => api.assistant.ask({ caseId, conversationId: conversationId.current, message }),
+    mutationFn: (message: string) => api.assistant.ask({ caseId, conversationId: conversationId.current, message, mode }),
     onSuccess: (res) => {
       conversationId.current = res.conversationId;
       setMessages((m) => [...m.filter((x) => !x.pending), res.message]);
@@ -52,6 +52,16 @@ export function ChatView({ caseId, caseTitle, header }: Props) {
     setInput('');
     ask.mutate(t);
   };
+
+  // التدريب يبدأ مباشرة بسؤال القاضي الأول
+  const started = useRef(false);
+  useEffect(() => {
+    if (mode === 'practice' && !started.current) {
+      started.current = true;
+      send('ابدأ التدريب');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
 
   const suggestions = caseId ? CASE_SUGGESTIONS : GENERAL_SUGGESTIONS;
 

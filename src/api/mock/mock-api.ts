@@ -1,7 +1,7 @@
 import { ApiError } from '../client';
 import type { Api } from '../services/contracts';
 import type { Case, CaseDocument, CaseSummary, ChatMessage, Citation, Deadline, Memo } from '../types';
-import { stageLabels } from '@/features/labels';
+import { memoKindLabels, stageLabels } from '@/features/labels';
 
 import { intakeNext } from './intake';
 import { buildMockCases, buildMockNotifications, citations } from './data';
@@ -144,6 +144,36 @@ function mockExtraction(c: Case, doc: CaseDocument): CaseDocument['extraction'] 
   return { kind: doc.kind, summary: 'حُفظ المستند في ملف القضية، وسأستعمله في التقييم والمذكرات.', keyPoints: [], requests: [], deadlines: [] };
 }
 
+/** تدريب الجلسة: AI يؤدي دور القاضي، ويعلّق على كل إجابة ثم يسأل التالي. */
+const JUDGE_QUESTIONS = [
+  'المدعي: اذكر دعواك باختصار، وما الذي تطلبه من المحكمة تحديداً؟',
+  'المدعى عليه يقول إنه صرف المستحقات نقداً. ما ردك؟',
+  'هل لديك ما يثبت تاريخ إنهاء العلاقة وسببه؟',
+  'هل لديك أقوال أخيرة قبل أن ننظر في الطلبات؟',
+];
+
+function practiceTurn(index: number, message: string, c?: Case): { content: string; citations: Citation[] } {
+  const start = message.trim() === 'ابدأ التدريب';
+  if (start) {
+    return {
+      content: `سأكون القاضي في جلسة "${c?.title ?? 'قضيتك'}". أجب كما ستجيب في الجلسة، باختصار ووضوح، وسأعلّق على كل إجابة.\n\nالقاضي: ${JUDGE_QUESTIONS[0]}`,
+      citations: [],
+    };
+  }
+  const q = index; // عدد إجابات المستخدم السابقة = رقم السؤال الحالي (بعد رسالة البدء)
+  const short = message.trim().length < 40;
+  const feedback = short
+    ? 'ملاحظة: إجابتك مختصرة جداً. اذكر الواقعة والتاريخ والمستند الذي يثبتها.'
+    : 'ملاحظة: إجابة جيدة. اختصرها في جملتين أمام القاضي، وأشر إلى رقم المستند في ملفك.';
+  const next = JUDGE_QUESTIONS[q];
+  return {
+    content: next
+      ? `${feedback}\n\nالقاضي: ${next}`
+      : `${feedback}\n\nانتهى التدريب. أنت جاهز. راجع قائمة التجهيز، واحمل نسخة من مستنداتك مرتبة بالأرقام.`,
+    citations: [],
+  };
+}
+
 export const mockApi: Api = {
   auth: {
     async requestOtp({ phone }) {
@@ -270,7 +300,7 @@ export const mockApi: Api = {
         id: uid('memo'),
         caseId,
         kind,
-        title: 'مسودة جديدة',
+        title: `${memoKindLabels[kind]} (مسودة)`,
         status: 'draft',
         updatedAt: new Date().toISOString(),
         generatedByAI: true,
@@ -287,11 +317,12 @@ export const mockApi: Api = {
       await delay(150);
       return clone(conversationId ? (db.conversations.get(conversationId) ?? []) : []);
     },
-    async ask({ caseId, conversationId, message }) {
+    async ask({ caseId, conversationId, message, mode }) {
       await delay(1100);
       const id = conversationId ?? uid('conv');
       const c = caseId ? db.cases.find((x) => x.id === caseId) : undefined;
-      const answer = mockAnswer(message, c);
+      const turnIndex = (db.conversations.get(id) ?? []).filter((m) => m.role === 'user').length;
+      const answer = mode === 'practice' ? practiceTurn(turnIndex, message, c) : mockAnswer(message, c);
       const list = db.conversations.get(id) ?? [];
       const now = new Date().toISOString();
       list.push({ id: uid('msg'), role: 'user', content: message, createdAt: now });
