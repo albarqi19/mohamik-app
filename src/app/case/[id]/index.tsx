@@ -60,6 +60,9 @@ export default function CaseDetail() {
       case 'upload_document':
         router.push({ pathname: '/upload', params: { caseId: c.id } });
         break;
+      case 'file_najiz':
+        router.push({ pathname: '/case/[id]/najiz', params: { id: c.id } });
+        break;
       case 'ask_ai':
         router.push({ pathname: '/chat', params: { caseId: c.id, title: c.title } });
         break;
@@ -128,6 +131,22 @@ export default function CaseDetail() {
           <NextStepItem key={s.id} step={s} onToggle={() => toggle.mutate(s.id)} onOpen={s.action ? () => openStep(s) : undefined} />
         ))}
       </Card>
+
+      {(c.stage === 'assessment' || c.stage === 'drafting') && c.userRole === 'plaintiff' ? (
+        <Card
+          tone="accent"
+          onPress={() => router.push({ pathname: '/case/[id]/najiz', params: { id: c.id } })}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Icon name="paper-plane-outline" size={22} color="accentText" />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="bodyStrong">{c.type === 'execution' ? 'جاهز لتقديم طلب التنفيذ؟' : 'جاهز لرفع الدعوى؟'}</Text>
+            <Text variant="caption" color="textMuted">
+              دليل ناجز خطوة بخطوة، ونص الدعوى جاهز للنسخ.
+            </Text>
+          </View>
+          <Icon name={ICON_FORWARD} size={18} color="textMuted" />
+        </Card>
+      ) : null}
 
       {/* إجراءات سريعة */}
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>

@@ -9,9 +9,12 @@ type Settings = {
   hijriFirst: boolean;
   hearingReminders: boolean;
   deadlineReminders: boolean;
+  appLock: boolean;
 };
 
 type SettingsContextValue = Settings & {
+  /** قرئت الإعدادات المحفوظة */
+  loaded: boolean;
   update: (patch: Partial<Settings>) => void;
 };
 
@@ -20,6 +23,7 @@ const DEFAULTS: Settings = {
   hijriFirst: false,
   hearingReminders: true,
   deadlineReminders: true,
+  appLock: false,
 };
 
 const KEY = 'mohamik.settings';
@@ -27,16 +31,20 @@ const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 export function SettingsProvider({ children }: PropsWithChildren) {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    storage.get(KEY).then((raw) => {
-      if (!raw) return;
-      try {
-        setSettings({ ...DEFAULTS, ...(JSON.parse(raw) as Partial<Settings>) });
-      } catch {
-        // إعدادات تالفة: نبقي الافتراضي
-      }
-    });
+    storage
+      .get(KEY)
+      .then((raw) => {
+        if (!raw) return;
+        try {
+          setSettings({ ...DEFAULTS, ...(JSON.parse(raw) as Partial<Settings>) });
+        } catch {
+          // إعدادات تالفة: نبقي الافتراضي
+        }
+      })
+      .finally(() => setLoaded(true));
   }, []);
 
   const update = (patch: Partial<Settings>) => {
@@ -47,7 +55,7 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     });
   };
 
-  return <SettingsContext.Provider value={{ ...settings, update }}>{children}</SettingsContext.Provider>;
+  return <SettingsContext.Provider value={{ ...settings, loaded, update }}>{children}</SettingsContext.Provider>;
 }
 
 export function useSettings(): SettingsContextValue {

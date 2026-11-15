@@ -238,7 +238,7 @@ export const mockApi: Api = {
         nextSteps: [
           { id: uid('s'), title: 'ارفع المستندات الأساسية', detail: 'العقود والمراسلات وأي إثباتات لديك.', action: 'upload_document', done: false },
           { id: uid('s'), title: 'دع AI يصوغ صحيفة الدعوى', detail: 'مبنية على وقائعك والأنظمة ذات الصلة.', action: 'draft_memo', done: false },
-          { id: uid('s'), title: 'قيّد الدعوى في ناجز', detail: 'سنرشدك خطوة بخطوة.', done: false },
+          { id: uid('s'), title: 'قيّد الدعوى في ناجز', detail: 'سنرشدك خطوة بخطوة.', action: 'file_najiz', done: false },
         ],
       };
       db.cases.unshift(c);
@@ -373,6 +373,16 @@ export const mockApi: Api = {
     async next({ sessionId, answer }) {
       await delay(answer ? 900 : 200);
       return intakeNext(sessionId, answer);
+    },
+  },
+
+  account: {
+    async exportData() {
+      await delay(700);
+      return { exportedAt: new Date().toISOString(), cases: clone(db.cases), notifications: clone(db.notifications) };
+    },
+    async deleteAccount() {
+      await delay(700);
     },
   },
 

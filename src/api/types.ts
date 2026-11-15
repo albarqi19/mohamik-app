@@ -227,7 +227,7 @@ export type NextStep = {
   title: string;
   detail: string;
   dueAt?: ISODate;
-  action?: 'prepare_hearing' | 'draft_memo' | 'upload_document' | 'draft_appeal' | 'ask_ai';
+  action?: 'prepare_hearing' | 'draft_memo' | 'upload_document' | 'draft_appeal' | 'ask_ai' | 'file_najiz';
   done: boolean;
 };
 

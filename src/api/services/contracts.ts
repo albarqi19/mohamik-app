@@ -53,6 +53,13 @@ export interface DocumentsService {
   extract(documentId: ID): Promise<CaseDocument>;
 }
 
+export interface AccountService {
+  /** حق التصدير (نظام حماية البيانات الشخصية) */
+  exportData(): Promise<unknown>;
+  /** حق الحذف: يحذف الحساب وكل بياناته */
+  deleteAccount(): Promise<void>;
+}
+
 export interface IntakeService {
   /** بدون answer يبدأ جلسة جديدة؛ ومع answer يعيد الدور التالي */
   next(input: IntakeAnswer): Promise<IntakeTurn>;
@@ -87,4 +94,5 @@ export type Api = {
   referrals: ReferralsService;
   intake: IntakeService;
   documents: DocumentsService;
+  account: AccountService;
 };
