@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { api, type Case, type DraftMemoInput, type HearingOutcomeInput, type NewDeadlineInput, type NewHearingInput, type NewCaseInput, type UploadInput } from '@/api';
+import { api, type Case, type DraftMemoInput, type HearingOutcomeInput, type NajizImportInput, type NewDeadlineInput, type NewHearingInput, type NewCaseInput, type UploadInput } from '@/api';
 
 /** مفاتيح ومكوّنات الاستعلامات (React Query) لكل البيانات. */
 export const qk = {
@@ -118,6 +118,18 @@ export function useAddDate(caseId: string) {
       void qc.invalidateQueries({ queryKey: qk.cases });
       void qc.invalidateQueries({ queryKey: ['hearings'] });
       void qc.invalidateQueries({ queryKey: qk.deadlines });
+    },
+  });
+}
+
+export function useApplyNajizImport(caseId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: NajizImportInput) => api.cases.applyNajizImport(caseId, input),
+    onSuccess: (c) => {
+      qc.setQueryData(qk.case(caseId), c);
+      void qc.invalidateQueries({ queryKey: qk.cases });
+      void qc.invalidateQueries({ queryKey: ['hearings'] });
     },
   });
 }

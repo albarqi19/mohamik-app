@@ -1,5 +1,5 @@
 import { ApiError } from '../client';
-import type { Case, NewDeadlineInput, NewHearingInput } from '../types';
+import type { Case, NajizImportInput, NewDeadlineInput, NewHearingInput } from '../types';
 import { DEFAULT_PREP } from './hearing-outcome';
 
 const uid = (p: string) => `${p}-${Math.random().toString(36).slice(2, 9)}`;
@@ -50,6 +50,30 @@ export function addManualHearing(c: Case, input: NewHearingInput, now = new Date
   if (c.stage === 'assessment' || c.stage === 'drafting' || c.stage === 'filed') c.stage = 'hearings';
   c.nextSteps.unshift({ id: uid('s'), title: `جهّز للجلسة ${number}`, detail: 'قائمة تجهيز جاهزة لك.', dueAt: input.scheduledAt, action: 'prepare_hearing', done: false });
   c.timeline.push({ id: uid('t'), at: now.toISOString(), kind: 'hearing', title: `حُددت الجلسة ${number}` });
+  c.updatedAt = now.toISOString();
+  return c;
+}
+
+/** يطبق ما أكده المستخدم من ناجز: رقم القضية والمحكمة والجلسات الجديدة فقط (بلا تكرار لليوم نفسه). */
+export function applyNajizImport(c: Case, input: NajizImportInput, now = new Date()): Case {
+  if (input.caseNumber) c.caseNumber = input.caseNumber;
+  if (input.court) c.court = { ...c.court, ...input.court };
+  if (input.caseNumber && (c.stage === 'assessment' || c.stage === 'drafting')) c.stage = 'filed';
+  const days = new Set(c.hearings.map((h) => h.scheduledAt.slice(0, 10)));
+  let added = 0;
+  for (const h of input.hearings) {
+    if (days.has(h.scheduledAt.slice(0, 10)) || new Date(h.scheduledAt).getTime() < now.getTime()) continue;
+    addManualHearing(c, h, now);
+    days.add(h.scheduledAt.slice(0, 10));
+    added++;
+  }
+  c.timeline.push({
+    id: uid('t'),
+    at: now.toISOString(),
+    kind: 'note',
+    title: 'استوردت بيانات القضية من ناجز',
+    detail: added ? `أضيفت ${added === 1 ? 'جلسة واحدة' : added === 2 ? 'جلستان' : `${added} جلسات`}` : undefined,
+  });
   c.updatedAt = now.toISOString();
   return c;
 }

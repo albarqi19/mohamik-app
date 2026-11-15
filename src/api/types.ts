@@ -236,6 +236,9 @@ export type NewDeadlineInput = { title: string; dueAt: ISODate; kind: DeadlineKi
 /** جلسة يضيفها المستخدم بنفسه */
 export type NewHearingInput = { scheduledAt: ISODate; mode: HearingMode; location?: string; meetingUrl?: string };
 
+/** ما أكده المستخدم مما قرأه التطبيق من ناجز على جهازه */
+export type NajizImportInput = { caseNumber?: string; court?: Court; hearings: { scheduledAt: ISODate; mode: HearingMode }[] };
+
 export type ChecklistItem = { id: ID; label: string; done: boolean };
 
 export type NextStep = {

@@ -54,7 +54,11 @@ export default function CaseDetail() {
       case 'draft_appeal': {
         const m = c.memos.find((x) => x.status !== 'submitted');
         if (m) router.push({ pathname: '/case/[id]/memo/[memoId]', params: { id: c.id, memoId: m.id } });
-        else router.push({ pathname: '/case/[id]/memo/new', params: { id: c.id, kind: step.action === 'draft_appeal' ? 'appeal' : 'statement_of_claim' } });
+        else
+          router.push({
+            pathname: '/case/[id]/memo/new',
+            params: { id: c.id, kind: step.action === 'draft_appeal' ? 'appeal' : 'statement_of_claim' },
+          });
         break;
       }
       case 'upload_document':
@@ -105,11 +109,17 @@ export default function CaseDetail() {
       </Card>
 
       {c.nextDeadline ? (
-        <DeadlineBanner deadline={c.nextDeadline} onConfirm={() => confirmDeadline.mutate(c.nextDeadline!.id)} confirming={confirmDeadline.isPending} />
+        <DeadlineBanner
+          deadline={c.nextDeadline}
+          onConfirm={() => confirmDeadline.mutate(c.nextDeadline!.id)}
+          confirming={confirmDeadline.isPending}
+        />
       ) : null}
 
       {c.assessment ? (
-        <Card onPress={() => router.push({ pathname: '/case/[id]/assessment', params: { id: c.id } })} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Card
+          onPress={() => router.push({ pathname: '/case/[id]/assessment', params: { id: c.id } })}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <ScoreRing score={c.assessment.score} size={64} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text variant="label" color="textMuted">
@@ -220,23 +230,32 @@ export default function CaseDetail() {
 
 function HearingsSection({ c }: { c: Case }) {
   const add = (
-    <View style={{ flexDirection: 'row', gap: 8 }}>
+    <View style={{ gap: 8 }}>
       <Button
-        title="أضف جلسة"
-        icon="calendar-outline"
-        variant="secondary"
+        title={c.caseNumber ? 'حدّث الجلسات من ناجز' : 'استورد قضيتك من ناجز'}
+        icon="sync-outline"
+        variant="accent"
         size="sm"
-        style={{ flex: 1 }}
-        onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'hearing' } })}
+        onPress={() => router.push({ pathname: '/case/[id]/najiz-connect', params: { id: c.id, mode: 'import' } })}
       />
-      <Button
-        title="أضف مهلة"
-        icon="alarm-outline"
-        variant="secondary"
-        size="sm"
-        style={{ flex: 1 }}
-        onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'deadline' } })}
-      />
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <Button
+          title="أضف جلسة"
+          icon="calendar-outline"
+          variant="secondary"
+          size="sm"
+          style={{ flex: 1 }}
+          onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'hearing' } })}
+        />
+        <Button
+          title="أضف مهلة"
+          icon="alarm-outline"
+          variant="secondary"
+          size="sm"
+          style={{ flex: 1 }}
+          onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'deadline' } })}
+        />
+      </View>
     </View>
   );
   if (!c.hearings.length)
@@ -294,9 +313,7 @@ function MinutesSection({ c }: { c: Case }) {
             <Text variant="bodyStrong">محضر {formatDate(m.date)}</Text>
             <AIBadge size="sm" />
           </View>
-          <Text variant="reading">
-            {m.summary}
-          </Text>
+          <Text variant="reading">{m.summary}</Text>
           <Text variant="label" color="textMuted">
             أهم النقاط
           </Text>
@@ -360,7 +377,9 @@ function TimelineSection({ c }: { c: Case }) {
       {events.map((e, i) => (
         <View key={e.id} style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ alignItems: 'center', width: 14 }}>
-            <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: i === 0 ? colors.accent : colors.border, marginTop: 7 }} />
+            <View
+              style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: i === 0 ? colors.accent : colors.border, marginTop: 7 }}
+            />
             {i < events.length - 1 ? <View style={{ width: 2, flex: 1, backgroundColor: colors.border }} /> : null}
           </View>
           <View style={{ flex: 1, paddingBottom: 18 }}>

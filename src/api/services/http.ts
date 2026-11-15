@@ -24,6 +24,7 @@ export const httpApi: Api = {
     upcomingHearings: () => http(v1('/agenda'), { query: { type: 'hearings' } }),
     awaitingOutcome: () => http(v1('/agenda'), { query: { type: 'awaiting_outcome' } }),
     addDeadline: (caseId, body) => http(v1(`/cases/${caseId}/deadlines`), { method: 'POST', body }),
+    applyNajizImport: (caseId, body) => http(v1(`/cases/${caseId}/najiz-import`), { method: 'POST', body }),
     addHearing: (caseId, body) => http(v1(`/cases/${caseId}/hearings`), { method: 'POST', body }),
     recordHearingOutcome: (_caseId, hearingId, body) => http(v1(`/hearings/${hearingId}/outcome`), { method: 'POST', body }),
     deadlines: () => http(v1('/deadlines'), { query: { range: 'upcoming' } }),
