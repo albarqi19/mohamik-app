@@ -6,11 +6,11 @@ import {
   useFonts,
 } from '@expo-google-fonts/ibm-plex-sans-arabic';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { I18nManager, Platform, View } from 'react-native';
+import { I18nManager, Platform, Pressable, Text as RNText, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -105,5 +105,22 @@ function RootNavigator() {
         </Stack.Protected>
       </Stack>
     </ThemeProvider>
+  );
+}
+
+/** شاشة خطأ عربية بدل الشاشة الافتراضية عند أي عطل غير متوقع. */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12, backgroundColor: '#F5F1E8' }}>
+      <RNText style={{ fontSize: 20, fontWeight: '700', color: '#0E2433', textAlign: 'center' }}>حدث خطأ غير متوقع</RNText>
+      <RNText style={{ fontSize: 14, color: '#5E6B73', textAlign: 'center' }}>نعتذر عن ذلك. حاول مرة أخرى، وإن تكرر الخطأ أعد تشغيل التطبيق.</RNText>
+      {__DEV__ ? <RNText style={{ fontSize: 12, color: '#A63A2B', textAlign: 'center' }}>{error.message}</RNText> : null}
+      <Pressable
+        onPress={retry}
+        accessibilityRole="button"
+        style={{ marginTop: 8, backgroundColor: '#0E2433', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 14 }}>
+        <RNText style={{ color: '#FFFFFF', fontWeight: '600' }}>إعادة المحاولة</RNText>
+      </Pressable>
+    </View>
   );
 }
