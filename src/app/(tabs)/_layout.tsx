@@ -2,6 +2,8 @@ import { Tabs } from 'expo-router';
 import { View, type ColorValue } from 'react-native';
 
 import { Icon, Text, type IconName } from '@/components/ui';
+import { useReminderSync } from '@/features/use-reminder-sync';
+import { useNotificationRouting } from '@/lib/notifications';
 import { fonts, palette, useTheme } from '@/theme';
 
 const tabIcon = (name: IconName, active: IconName) =>
@@ -11,6 +13,8 @@ const tabIcon = (name: IconName, active: IconName) =>
 
 export default function TabsLayout() {
   const { colors } = useTheme();
+  useReminderSync();
+  useNotificationRouting();
   return (
     <Tabs
       screenOptions={{
