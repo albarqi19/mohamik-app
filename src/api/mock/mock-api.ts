@@ -5,6 +5,7 @@ import { memoKindLabels, stageLabels } from '@/features/labels';
 
 import { applyHearingOutcome } from './hearing-outcome';
 import { intakeNext } from './intake';
+import { addManualDeadline, addManualHearing } from './manual-dates';
 import { buildMockCases, buildMockNotifications, citations } from './data';
 
 /** تطبيق تجريبي يعمل في الذاكرة، يحاكي زمن الشبكة. */
@@ -279,6 +280,14 @@ export const mockApi: Api = {
           .filter((h) => h.status === 'scheduled' && new Date(h.scheduledAt).getTime() < cutoff)
           .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
       );
+    },
+    async addDeadline(caseId, input) {
+      await delay(300);
+      return clone(addManualDeadline(findCase(caseId), input));
+    },
+    async addHearing(caseId, input) {
+      await delay(300);
+      return clone(addManualHearing(findCase(caseId), input));
     },
     async recordHearingOutcome(caseId, hearingId, input) {
       await delay(500);

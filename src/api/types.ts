@@ -230,6 +230,12 @@ export type Deadline = {
   confirmed: boolean;
 };
 
+/** مهلة يضيفها المستخدم بنفسه (من رسالة ناجز مثلا) */
+export type NewDeadlineInput = { title: string; dueAt: ISODate; kind: DeadlineKind };
+
+/** جلسة يضيفها المستخدم بنفسه */
+export type NewHearingInput = { scheduledAt: ISODate; mode: HearingMode; location?: string; meetingUrl?: string };
+
 export type ChecklistItem = { id: ID; label: string; done: boolean };
 
 export type NextStep = {

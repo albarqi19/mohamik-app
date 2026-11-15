@@ -36,6 +36,16 @@ export function formatHijri(iso: string): string {
   }
 }
 
+const weekdayOnly = new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-latn', { weekday: 'long' });
+
+export function formatWeekday(iso: string): string {
+  try {
+    return weekdayOnly.format(new Date(iso));
+  } catch {
+    return '';
+  }
+}
+
 export function formatWeekdayTime(iso: string): string {
   try {
     return weekdayTime.format(new Date(iso));

@@ -38,7 +38,7 @@ describe('case search', () => {
         ...base,
         id: 'deadline-2',
         title: 'd',
-        nextDeadline: { id: 'x', caseId: 'd', title: 't', dueAt: day(2), kind: 'memo', source: 'court', confirmed: true } as unknown as CaseSummary['nextDeadline'],
+        nextDeadline: { id: 'x', caseId: 'd', title: 't', dueAt: day(2), kind: 'memo_submission', source: 'manual', confirmed: true },
       },
     ];
     expect(sortByUrgency(cases, now).map((c) => c.id)).toEqual(['deadline-2', 'hearing-10', 'none-new', 'none-old']);

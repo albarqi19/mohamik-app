@@ -219,9 +219,36 @@ export default function CaseDetail() {
 }
 
 function HearingsSection({ c }: { c: Case }) {
-  if (!c.hearings.length) return <Text color="textMuted">لم تحدد جلسات بعد.</Text>;
+  const add = (
+    <View style={{ flexDirection: 'row', gap: 8 }}>
+      <Button
+        title="أضف جلسة"
+        icon="calendar-outline"
+        variant="secondary"
+        size="sm"
+        style={{ flex: 1 }}
+        onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'hearing' } })}
+      />
+      <Button
+        title="أضف مهلة"
+        icon="alarm-outline"
+        variant="secondary"
+        size="sm"
+        style={{ flex: 1 }}
+        onPress={() => router.push({ pathname: '/case/[id]/add-date', params: { id: c.id, type: 'deadline' } })}
+      />
+    </View>
+  );
+  if (!c.hearings.length)
+    return (
+      <View style={{ gap: 10 }}>
+        <Text color="textMuted">لم تحدد جلسات بعد.</Text>
+        {add}
+      </View>
+    );
   return (
     <View style={{ gap: 10 }}>
+      {add}
       {[...c.hearings].reverse().map((h) => (
         <Card
           key={h.id}

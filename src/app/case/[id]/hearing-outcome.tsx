@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import type { HearingResult } from '@/api';
-import { Button, Card, Chip, ErrorView, Icon, LoadingView, Screen, SectionHeader, Text, TextField } from '@/components/ui';
+import { DateQuickPicker } from '@/components/case/date-quick-picker';
+import { Button, Card, ErrorView, Icon, LoadingView, Screen, SectionHeader, Text, TextField } from '@/components/ui';
 import { useCase, useRecordHearingOutcome } from '@/features/queries';
-import { formatDate, formatHijri, formatWeekdayTime } from '@/lib/format';
+import { formatDate, formatWeekdayTime } from '@/lib/format';
 import { useTheme } from '@/theme';
 
 const RESULTS: { key: HearingResult; title: string; detail: string; icon: 'calendar-outline' | 'hourglass-outline' | 'hammer-outline' | 'close-circle-outline' }[] = [
@@ -16,16 +17,6 @@ const RESULTS: { key: HearingResult; title: string; detail: string; icon: 'calen
   { key: 'not_held', title: 'لم تنعقد', detail: 'غياب أو عذر، وحُدد موعد بديل', icon: 'close-circle-outline' },
 ];
 
-const QUICK_DAYS = [7, 14, 21, 30];
-const HOURS = [9, 10, 11, 12, 13];
-
-function atDay(days: number, hour: number): Date {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  d.setHours(hour, 0, 0, 0);
-  return d;
-}
-
 export default function HearingOutcomeScreen() {
   const { id, hearingId } = useLocalSearchParams<{ id: string; hearingId: string }>();
   const { data: c, isLoading, error, refetch } = useCase(id);
@@ -33,8 +24,7 @@ export default function HearingOutcomeScreen() {
   const { colors, spacing, radius } = useTheme();
 
   const [result, setResult] = useState<HearingResult | null>(null);
-  const [days, setDays] = useState<number | null>(null);
-  const [hour, setHour] = useState(10);
+  const [nextAt, setNextAt] = useState<string | undefined>();
   const [note, setNote] = useState('');
 
   if (isLoading) return <LoadingView />;
@@ -43,7 +33,6 @@ export default function HearingOutcomeScreen() {
 
   const needsDate = result === 'postponed' || result === 'not_held';
   const wantsDate = needsDate || result === 'reserved';
-  const nextAt = days != null ? atDay(days, hour).toISOString() : undefined;
   const canSave = !!result && (!needsDate || !!nextAt);
 
   const save = () => {
@@ -102,40 +91,7 @@ export default function HearingOutcomeScreen() {
         <>
           <SectionHeader title={result === 'reserved' ? 'موعد النطق بالحكم (إن عُرف)' : 'موعد الجلسة القادمة'} />
           <Card style={{ gap: spacing.md }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {QUICK_DAYS.map((d) => (
-                <Chip key={d} label={d === 7 ? 'بعد أسبوع' : d === 14 ? 'بعد أسبوعين' : d === 21 ? 'بعد 3 أسابيع' : 'بعد شهر'} selected={days === d} onPress={() => setDays(d)} />
-              ))}
-            </View>
-            {days != null ? (
-              <>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <Pressable accessibilityLabel="يوم قبل" onPress={() => setDays(Math.max(1, days - 1))} hitSlop={8}>
-                    <Icon name="remove-circle-outline" size={28} color="textMuted" />
-                  </Pressable>
-                  <View style={{ flex: 1, alignItems: 'center' }}>
-                    <Text variant="bodyStrong" align="center">
-                      {formatWeekdayTime(nextAt!)} · {formatDate(nextAt!)}
-                    </Text>
-                    <Text variant="caption" color="textMuted" align="center">
-                      {formatHijri(nextAt!)}
-                    </Text>
-                  </View>
-                  <Pressable accessibilityLabel="يوم بعد" onPress={() => setDays(days + 1)} hitSlop={8}>
-                    <Icon name="add-circle-outline" size={28} color="textMuted" />
-                  </Pressable>
-                </View>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                  {HOURS.map((hr) => (
-                    <Chip key={hr} label={`${hr > 12 ? hr - 12 : hr}:00 ${hr >= 12 ? 'م' : 'ص'}`} selected={hour === hr} onPress={() => setHour(hr)} />
-                  ))}
-                </View>
-              </>
-            ) : (
-              <Text variant="caption" color="textMuted">
-                اختر الأقرب ثم عدّل اليوم بالزرين، كما في المحضر أو رسالة ناجز.
-              </Text>
-            )}
+            <DateQuickPicker onChange={setNextAt} hint="اختر الأقرب ثم عدّل اليوم بالزرين، كما في المحضر أو رسالة ناجز." />
           </Card>
         </>
       ) : null}
