@@ -14,6 +14,7 @@ import { I18nManager, Platform, Pressable, Text as RNText, View } from 'react-na
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppLock } from '@/providers/app-lock';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { SettingsProvider } from '@/providers/settings-provider';
 import { AppThemeProvider, fonts, useTheme } from '@/theme';
@@ -46,7 +47,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <SettingsProvider>
             <AppThemeProvider>
-              <AuthProvider>{loaded ? <RootNavigator /> : <View style={{ flex: 1 }} />}</AuthProvider>
+              <AuthProvider>{loaded ? <AppLock><RootNavigator /></AppLock> : <View style={{ flex: 1 }} />}</AuthProvider>
             </AppThemeProvider>
           </SettingsProvider>
         </QueryClientProvider>
@@ -103,6 +104,8 @@ function RootNavigator() {
           <Stack.Screen name="chat" options={{ title: 'اسأل محاميك' }} />
           <Stack.Screen name="agenda" options={{ title: 'الجلسات والمهل' }} />
           <Stack.Screen name="notifications" options={{ title: 'الإشعارات' }} />
+          <Stack.Screen name="privacy" options={{ title: 'الخصوصية وبياناتي' }} />
+          <Stack.Screen name="case/[id]/najiz" options={{ title: 'رفع الدعوى في ناجز' }} />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

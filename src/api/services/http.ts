@@ -54,6 +54,10 @@ export const httpApi: Api = {
     },
     extract: (id) => http(v1(`/documents/${id}/extract`), { method: 'POST' }),
   },
+  account: {
+    exportData: () => http(v1('/me/export')),
+    deleteAccount: () => http(v1('/me'), { method: 'DELETE' }),
+  },
   intake: {
     next: (body) => http(v1('/intake/turns'), { method: 'POST', body }),
   },

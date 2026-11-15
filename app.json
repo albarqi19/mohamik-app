@@ -45,6 +45,12 @@
       ],
       "expo-secure-store",
       [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "يستخدم محاميك بصمة الوجه لقفل التطبيق وحماية قضاياك."
+        }
+      ],
+      [
         "expo-notifications",
         {
           "color": "#0E2433",
