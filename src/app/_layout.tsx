@@ -14,6 +14,8 @@ import { I18nManager, Platform, Pressable, Text as RNText, View } from 'react-na
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { OfflineBanner } from '@/components/ui/offline-banner';
+import { wireQueryLifecycle } from '@/lib/online';
 import { AppLock } from '@/providers/app-lock';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { SettingsProvider } from '@/providers/settings-provider';
@@ -27,6 +29,8 @@ if (Platform.OS !== 'web' && !I18nManager.isRTL) {
   I18nManager.allowRTL(true);
   I18nManager.forceRTL(true);
 }
+
+wireQueryLifecycle();
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -47,7 +51,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <SettingsProvider>
             <AppThemeProvider>
-              <AuthProvider>{loaded ? <AppLock><RootNavigator /></AppLock> : <View style={{ flex: 1 }} />}</AuthProvider>
+              <AuthProvider>{loaded ? <AppLock><RootNavigator /><OfflineBanner /></AppLock> : <View style={{ flex: 1 }} />}</AuthProvider>
             </AppThemeProvider>
           </SettingsProvider>
         </QueryClientProvider>
