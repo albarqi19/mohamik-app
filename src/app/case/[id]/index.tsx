@@ -60,6 +60,11 @@ export default function CaseDetail() {
       case 'upload_document':
         router.push({ pathname: '/upload', params: { caseId: c.id } });
         break;
+      case 'record_outcome': {
+        const h = c.hearings.find((x) => x.status === 'scheduled' && new Date(x.scheduledAt).getTime() < Date.now());
+        if (h) router.push({ pathname: '/case/[id]/hearing-outcome', params: { id: c.id, hearingId: h.id } });
+        break;
+      }
       case 'file_najiz':
         router.push({ pathname: '/case/[id]/najiz', params: { id: c.id } });
         break;

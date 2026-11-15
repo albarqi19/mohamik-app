@@ -98,3 +98,8 @@ const money = new Intl.NumberFormat('ar-SA-u-nu-latn', { maximumFractionDigits: 
 export function formatMoney(amount: number): string {
   return `${money.format(amount)} ر.س`;
 }
+
+/** هل مضى هذا الموعد؟ */
+export function isPast(iso: string, now: Date = new Date()): boolean {
+  return new Date(iso).getTime() < now.getTime();
+}

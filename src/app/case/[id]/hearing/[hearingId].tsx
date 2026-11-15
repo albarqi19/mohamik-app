@@ -5,7 +5,7 @@ import { Pressable, View } from 'react-native';
 import { AIBadge, Badge, Button, Card, ErrorView, Icon, LoadingView, ProgressBar, Screen, Text } from '@/components/ui';
 import { hearingModeLabels, hearingStatusLabels } from '@/features/labels';
 import { useCase, useToggleHearingPrep } from '@/features/queries';
-import { formatDate, formatHijri, formatWeekdayTime, relativeDays } from '@/lib/format';
+import { formatDate, formatHijri, formatWeekdayTime, isPast, relativeDays } from '@/lib/format';
 import { useTheme } from '@/theme';
 
 export default function HearingPrep() {
@@ -22,6 +22,7 @@ export default function HearingPrep() {
   const total = h.preparation.length;
   const lastMinute = c.minutes[c.minutes.length - 1];
   const upcoming = h.status === 'scheduled';
+  const started = upcoming && isPast(h.scheduledAt);
 
   return (
     <Screen edges={[]}>
@@ -45,6 +46,21 @@ export default function HearingPrep() {
           <Button title="فتح رابط الجلسة في ناجز" variant="accent" icon="videocam-outline" onPress={() => Linking.openURL(h.meetingUrl!)} />
         ) : null}
       </Card>
+
+      {upcoming ? (
+        <Card tone={started ? 'accent' : 'muted'} style={{ gap: 8 }}>
+          <Text variant="bodyStrong">{started ? 'انتهت الجلسة؟ أخبرني بما جرى' : 'بعد الجلسة'}</Text>
+          <Text variant="caption" color="textMuted">
+            تأجيل، حجز للحكم، أو حكم: أرتب لك الخطوة التالية والتذكيرات.
+          </Text>
+          <Button
+            title="سجّل ما جرى"
+            variant={started ? 'primary' : 'secondary'}
+            size="sm"
+            onPress={() => router.push({ pathname: '/case/[id]/hearing-outcome', params: { id: c.id, hearingId: h.id } })}
+          />
+        </Card>
+      ) : null}
 
       {h.agenda || h.outcome ? (
         <Card style={{ gap: 4 }}>

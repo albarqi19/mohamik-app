@@ -5,7 +5,7 @@ import { CaseCard } from '@/components/case/case-card';
 import { DeadlineBanner } from '@/components/case/deadline-banner';
 import { AIBadge, Card, Icon, ICON_FORWARD, LoadingView, SectionHeader, Text, Screen, Button } from '@/components/ui';
 import { hearingModeLabels } from '@/features/labels';
-import { useCases, useDeadlines, useNotifications, useUpcomingHearings } from '@/features/queries';
+import { useAwaitingOutcome, useCases, useDeadlines, useNotifications, useUpcomingHearings } from '@/features/queries';
 import { formatHijri, formatWeekdayTime, relativeDays } from '@/lib/format';
 import { useAuth } from '@/providers/auth-provider';
 import { fonts, useTheme } from '@/theme';
@@ -21,6 +21,8 @@ export default function Home() {
   const cases = useCases();
   const deadlines = useDeadlines();
   const hearings = useUpcomingHearings();
+  const awaiting = useAwaitingOutcome();
+  const pastHearing = awaiting.data?.[0];
   const notifications = useNotifications();
   const unread = notifications.data?.filter((n) => !n.read).length ?? 0;
 
@@ -96,6 +98,24 @@ export default function Home() {
         <Pressable onPress={() => router.push({ pathname: '/case/[id]', params: { id: urgentDeadline.caseId } })}>
           <DeadlineBanner deadline={urgentDeadline} />
         </Pressable>
+      ) : null}
+
+      {pastHearing ? (
+        <Card
+          tone="accent"
+          onPress={() =>
+            router.push({ pathname: '/case/[id]/hearing-outcome', params: { id: pastHearing.caseId, hearingId: pastHearing.id } })
+          }
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Icon name="chatbubble-ellipses-outline" size={22} color="accentText" />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="bodyStrong">كيف كانت جلستك؟</Text>
+            <Text variant="caption" color="textMuted">
+              {pastHearing.caseTitle} · الجلسة {pastHearing.number}. أخبرني بما جرى لأرتب الخطوة التالية.
+            </Text>
+          </View>
+          <Icon name={ICON_FORWARD} size={18} color="textMuted" />
+        </Card>
       ) : null}
 
       {/* اسأل بسرعة */}

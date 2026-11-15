@@ -148,6 +148,16 @@ export type Hearing = {
   preparation: ChecklistItem[];
 };
 
+/** ما جرى في الجلسة كما يسجله المستخدم بعدها. */
+export type HearingResult = 'postponed' | 'reserved' | 'judgment' | 'not_held';
+
+export type HearingOutcomeInput = {
+  result: HearingResult;
+  /** موعد الجلسة التالية أو جلسة النطق بالحكم */
+  nextAt?: ISODate;
+  note?: string;
+};
+
 export type Minute = {
   id: ID;
   caseId: ID;
@@ -227,7 +237,7 @@ export type NextStep = {
   title: string;
   detail: string;
   dueAt?: ISODate;
-  action?: 'prepare_hearing' | 'draft_memo' | 'upload_document' | 'draft_appeal' | 'ask_ai' | 'file_najiz';
+  action?: 'prepare_hearing' | 'draft_memo' | 'upload_document' | 'draft_appeal' | 'ask_ai' | 'file_najiz' | 'record_outcome';
   done: boolean;
 };
 

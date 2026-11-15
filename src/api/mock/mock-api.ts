@@ -3,6 +3,7 @@ import type { Api } from '../services/contracts';
 import type { Case, CaseDocument, CaseSummary, ChatMessage, Citation, Deadline, Memo } from '../types';
 import { memoKindLabels, stageLabels } from '@/features/labels';
 
+import { applyHearingOutcome } from './hearing-outcome';
 import { intakeNext } from './intake';
 import { buildMockCases, buildMockNotifications, citations } from './data';
 
@@ -268,6 +269,20 @@ export const mockApi: Api = {
           .filter((h) => h.status === 'scheduled' && new Date(h.scheduledAt).getTime() >= now - 3600000)
           .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
       );
+    },
+    async awaitingOutcome() {
+      await delay();
+      const cutoff = Date.now() - 3600000;
+      return clone(
+        db.cases
+          .flatMap((c) => c.hearings.map((h) => ({ ...h, caseTitle: c.title })))
+          .filter((h) => h.status === 'scheduled' && new Date(h.scheduledAt).getTime() < cutoff)
+          .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
+      );
+    },
+    async recordHearingOutcome(caseId, hearingId, input) {
+      await delay(500);
+      return clone(applyHearingOutcome(findCase(caseId), hearingId, input));
     },
     async deadlines() {
       await delay();
