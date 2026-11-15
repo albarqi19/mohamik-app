@@ -20,7 +20,7 @@ import {
   stageDescriptions,
   stageLabels,
 } from '@/features/labels';
-import { useCase, useToggleNextStep } from '@/features/queries';
+import { useCase, useConfirmDeadline, useToggleNextStep } from '@/features/queries';
 import { formatDate, formatWeekdayTime, relativeDays } from '@/lib/format';
 import { useTheme } from '@/theme';
 
@@ -36,6 +36,7 @@ export default function CaseDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: c, isLoading, error, refetch, isRefetching } = useCase(id);
   const toggle = useToggleNextStep(id);
+  const confirmDeadline = useConfirmDeadline(id);
   const { colors, spacing, radius } = useTheme();
   const [section, setSection] = useState<Section>('hearings');
 
@@ -55,6 +56,9 @@ export default function CaseDetail() {
         if (m) router.push({ pathname: '/case/[id]/memo/[memoId]', params: { id: c.id, memoId: m.id } });
         break;
       }
+      case 'upload_document':
+        router.push({ pathname: '/upload', params: { caseId: c.id } });
+        break;
       case 'ask_ai':
         router.push({ pathname: '/chat', params: { caseId: c.id, title: c.title } });
         break;
@@ -91,7 +95,9 @@ export default function CaseDetail() {
         <StageTracker stage={c.stage} />
       </Card>
 
-      {c.nextDeadline ? <DeadlineBanner deadline={c.nextDeadline} /> : null}
+      {c.nextDeadline ? (
+        <DeadlineBanner deadline={c.nextDeadline} onConfirm={() => confirmDeadline.mutate(c.nextDeadline!.id)} confirming={confirmDeadline.isPending} />
+      ) : null}
 
       {c.assessment ? (
         <Card onPress={() => router.push({ pathname: '/case/[id]/assessment', params: { id: c.id } })} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
@@ -212,10 +218,24 @@ function HearingsSection({ c }: { c: Case }) {
 }
 
 function MinutesSection({ c }: { c: Case }) {
+  const add = (
+    <Button
+      title="أضف محضراً"
+      icon="camera-outline"
+      variant="secondary"
+      onPress={() => router.push({ pathname: '/upload', params: { caseId: c.id, kind: 'minute' } })}
+    />
+  );
   if (!c.minutes.length)
-    return <Text color="textMuted">لا توجد محاضر بعد. بعد كل جلسة ارفع المحضر أو صوّره، وسألخصه وأستخرج المطلوب منك.</Text>;
+    return (
+      <View style={{ gap: 10 }}>
+        <Text color="textMuted">لا توجد محاضر بعد. بعد كل جلسة ارفع المحضر أو صوّره، وسألخصه وأستخرج المطلوب منك.</Text>
+        {add}
+      </View>
+    );
   return (
     <View style={{ gap: 10 }}>
+      {add}
       {c.minutes.map((m) => (
         <Card key={m.id} style={{ gap: 8 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>

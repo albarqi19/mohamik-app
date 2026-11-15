@@ -44,6 +44,14 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "يحتاج محاميك إلى صورك لرفع المحاضر والأحكام والمستندات.",
+          "cameraPermission": "يحتاج محاميك إلى الكاميرا لتصوير المحاضر والأحكام والمستندات.",
+          "microphonePermission": false
+        }
+      ],
       "expo-font"
     ],
     "experiments": {

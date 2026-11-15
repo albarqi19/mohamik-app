@@ -77,3 +77,30 @@ describe('labels', () => {
     expect([...idx].sort((a, b) => a - b)).toEqual(idx);
   });
 });
+
+describe('documents', () => {
+  test('uploading a minute extracts an unconfirmed deadline that the user can confirm', async () => {
+    const before = await mockApi.cases.get('case-3');
+    const doc = await mockApi.documents.upload({ caseId: 'case-3', kind: 'minute', uri: 'file:///x.jpg', name: 'محضر.jpg', mimeType: 'image/jpeg' });
+    const read = await mockApi.documents.extract(doc.id);
+    expect(read.extraction?.deadlines[0].confirmed).toBe(false);
+    const after = await mockApi.cases.get('case-3');
+    expect(after.minutes.length).toBe(before.minutes.length + 1);
+    expect(after.documents?.[0].id).toBe(doc.id);
+    const d = read.extraction!.deadlines[0];
+    const all = await mockApi.cases.deadlines();
+    expect(all.some((x) => x.id === d.id && !x.confirmed)).toBe(true);
+    await mockApi.cases.confirmDeadline('case-3', d.id);
+    const again = await mockApi.cases.deadlines();
+    expect(again.find((x) => x.id === d.id)?.confirmed).toBe(true);
+  });
+
+  test('a judgment upload computes an appeal deadline about 30 days out', async () => {
+    const doc = await mockApi.documents.upload({ caseId: 'case-4', kind: 'judgment', uri: 'file:///y.pdf', name: 'صك.pdf', mimeType: 'application/pdf' });
+    const read = await mockApi.documents.extract(doc.id);
+    const d = read.extraction!.deadlines[0];
+    expect(d.kind).toBe('appeal');
+    const days = Math.round((new Date(d.dueAt).getTime() - Date.now()) / 86400000);
+    expect(days).toBe(30);
+  });
+});

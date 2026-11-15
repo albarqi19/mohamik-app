@@ -23,6 +23,7 @@ export const httpApi: Api = {
       http(v1(`/hearings/${hearingId}/prepare/items/${itemId}/toggle`), { method: 'POST' }),
     upcomingHearings: () => http(v1('/agenda'), { query: { type: 'hearings' } }),
     deadlines: () => http(v1('/deadlines'), { query: { range: 'upcoming' } }),
+    confirmDeadline: (_caseId, deadlineId) => http(v1(`/deadlines/${deadlineId}/confirm`), { method: 'POST' }),
   },
   memos: {
     get: (_caseId, memoId) => http(v1(`/memos/${memoId}`)),
@@ -38,6 +39,20 @@ export const httpApi: Api = {
         (await http<{ id: string }>(v1('/ai/conversations'), { method: 'POST', body: { caseId } })).id;
       return http(v1(`/ai/conversations/${id}/messages`), { method: 'POST', body: { content: message } });
     },
+  },
+  documents: {
+    // رفع مباشر بعنوان موقّع: نطلب العنوان، نرفع الملف، ثم نسجّله
+    upload: async ({ caseId, kind, uri, name, mimeType, size, file }) => {
+      const { uploadUrl, documentId } = await http<{ uploadUrl: string; documentId: string }>(v1('/documents/upload-url'), {
+        method: 'POST',
+        body: { caseId, kind, name, mimeType, size },
+      });
+      const blob = file ?? (await (await fetch(uri)).blob());
+      const put = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': mimeType }, body: blob });
+      if (!put.ok) throw new Error('تعذر رفع الملف');
+      return http(v1(`/documents/${documentId}`));
+    },
+    extract: (id) => http(v1(`/documents/${id}/extract`), { method: 'POST' }),
   },
   intake: {
     next: (body) => http(v1('/intake/turns'), { method: 'POST', body }),
