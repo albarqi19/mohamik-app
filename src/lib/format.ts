@@ -91,3 +91,10 @@ export function relativeDays(iso: string): string {
   if (d === -2) return 'قبل يومين';
   return d > 0 ? `بعد ${daysPhrase(d)}` : `قبل ${daysPhrase(-d)}`;
 }
+
+const money = new Intl.NumberFormat('ar-SA-u-nu-latn', { maximumFractionDigits: 0 });
+
+/** مبلغ بالريال: 67,500 ر.س */
+export function formatMoney(amount: number): string {
+  return `${money.format(amount)} ر.س`;
+}

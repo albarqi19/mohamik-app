@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Share, View } from 'react-native';
 
 import { CitationChip } from '@/components/case/citation-chip';
+import { LawyerReferral } from '@/components/case/lawyer-referral';
 import { AIBadge, Badge, Button, Card, ErrorView, LoadingView, Screen, Text } from '@/components/ui';
 import { memoKindLabels, memoStatusLabels } from '@/features/labels';
 import { useMemo_ } from '@/features/queries';
@@ -63,6 +64,8 @@ export default function MemoScreen() {
           </Text>
         </Card>
       ) : null}
+
+      {m.status !== 'submitted' ? <LawyerReferral caseId={id} /> : null}
     </Screen>
   );
 }

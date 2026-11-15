@@ -5,6 +5,7 @@ import { Pressable, TextInput, View } from 'react-native';
 import { api, useMockApi } from '@/api';
 import { ApiError } from '@/api/client';
 import { Button, Text } from '@/components/ui';
+import { toLatinDigits } from '@/lib/phone';
 import { useAuth } from '@/providers/auth-provider';
 import { fonts, useTheme } from '@/theme';
 
@@ -42,7 +43,7 @@ export default function Verify() {
   };
 
   const onChange = (text: string) => {
-    const digits = text.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/\D/g, '').slice(0, CODE_LENGTH);
+    const digits = toLatinDigits(text).replace(/\D/g, '').slice(0, CODE_LENGTH);
     setCode(digits);
     if (digits.length === CODE_LENGTH) void verify(digits);
   };

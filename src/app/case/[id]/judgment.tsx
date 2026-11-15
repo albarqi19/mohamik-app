@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import { CitationChip } from '@/components/case/citation-chip';
 import { DeadlineBanner } from '@/components/case/deadline-banner';
+import { LawyerReferral } from '@/components/case/lawyer-referral';
 import { AIBadge, Badge, Button, Card, EmptyState, ErrorView, LoadingView, Screen, Text } from '@/components/ui';
 import { appealKindLabels, appealStatusLabels, outcomeLabels } from '@/features/labels';
 import { useCase } from '@/features/queries';
@@ -83,6 +84,8 @@ export default function JudgmentScreen() {
           <Button title="قيّم فرص الاعتراض" onPress={() => router.push({ pathname: '/chat', params: { caseId: c.id, title: c.title } })} />
         </Card>
       )}
+
+      <LawyerReferral caseId={c.id} emphasized={j.outcome !== 'in_favor'} />
     </Screen>
   );
 }

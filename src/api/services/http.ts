@@ -39,6 +39,9 @@ export const httpApi: Api = {
       return http(v1(`/ai/conversations/${id}/messages`), { method: 'POST', body: { content: message } });
     },
   },
+  referrals: {
+    request: (caseId, note) => http(v1(`/cases/${caseId}/referrals`), { method: 'POST', body: { note } }),
+  },
   notifications: {
     list: () => http(v1('/notifications')),
     markRead: (id) => http(v1(`/notifications/${id}`), { method: 'PATCH', body: { read: true } }),
