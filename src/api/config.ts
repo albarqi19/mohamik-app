@@ -5,7 +5,8 @@
  */
 export const apiConfig = {
   baseUrl: process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '') ?? '',
-  timeoutMs: 20000,
+  // ردود المحامي الذكي وصياغة المذكرات تأخذ دقيقة أحيانا
+  timeoutMs: 150000,
 };
 
 export const useMockApi = apiConfig.baseUrl.length === 0;

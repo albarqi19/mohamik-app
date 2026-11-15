@@ -38,11 +38,11 @@ export const httpApi: Api = {
     history: (conversationId) =>
       conversationId ? http(v1(`/ai/conversations/${conversationId}/messages`)) : Promise.resolve([]),
     // ملاحظة: الخلفية ستبث الرد عبر SSE؛ هذا الشكل غير المتدفق يكفي للبداية وسيُرقّى إلى expo/fetch المتدفق.
-    ask: async ({ conversationId, caseId, message }) => {
+    ask: async ({ conversationId, caseId, message, mode }) => {
       const id =
         conversationId ??
-        (await http<{ id: string }>(v1('/ai/conversations'), { method: 'POST', body: { caseId } })).id;
-      return http(v1(`/ai/conversations/${id}/messages`), { method: 'POST', body: { content: message } });
+        (await http<{ id: string }>(v1('/ai/conversations'), { method: 'POST', body: { caseId, mode } })).id;
+      return http(v1(`/ai/conversations/${id}/messages`), { method: 'POST', body: { content: message, caseId, mode } });
     },
   },
   documents: {
