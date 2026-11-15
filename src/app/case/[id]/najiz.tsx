@@ -41,7 +41,7 @@ export default function NajizGuideScreen() {
         <Text style={{ color: colors.heroMuted }}>
           سأرافقك خطوة بخطوة. علّم كل خطوة عند إنجازها، ونصّ الدعوى جاهز للنسخ.
         </Text>
-        <ProgressBar value={steps.length ? count / steps.length : 0} />
+        <ProgressBar value={steps.length ? count / steps.length : 0} onHero />
         <Text variant="caption" style={{ color: colors.heroMuted }}>
           {count} من {steps.length} خطوات
         </Text>

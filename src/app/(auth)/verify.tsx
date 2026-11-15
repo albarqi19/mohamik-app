@@ -113,7 +113,7 @@ export default function Verify() {
       ) : null}
 
       <Button title="تحقق" onPress={() => verify(code)} disabled={code.length !== CODE_LENGTH} loading={loading} />
-      <Pressable disabled={seconds > 0} onPress={resend} hitSlop={10}>
+      <Pressable disabled={seconds > 0} onPress={resend} hitSlop={10} accessibilityRole="button" accessibilityState={{ disabled: seconds > 0 }}>
         <Text align="center" color={seconds > 0 ? 'textMuted' : 'accentText'}>
           {seconds > 0 ? `إعادة الإرسال بعد ${seconds} ثانية` : 'إعادة إرسال الرمز'}
         </Text>

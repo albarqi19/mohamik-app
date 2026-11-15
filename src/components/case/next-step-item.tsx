@@ -14,6 +14,7 @@ export function NextStepItem({ step, onToggle, onOpen }: { step: NextStep; onTog
         hitSlop={10}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: step.done }}
+        accessibilityLabel={step.title}
         style={{
           width: 26,
           height: 26,
@@ -27,7 +28,7 @@ export function NextStepItem({ step, onToggle, onOpen }: { step: NextStep; onTog
         }}>
         {step.done ? <Icon name="checkmark" size={16} rawColor="#fff" /> : null}
       </Pressable>
-      <Pressable onPress={onOpen} disabled={!onOpen} style={{ flex: 1, gap: 2 }}>
+      <Pressable onPress={onOpen} disabled={!onOpen} accessibilityRole={onOpen ? 'button' : undefined} style={{ flex: 1, gap: 2 }}>
         <Text variant="bodyStrong" color={step.done ? 'textMuted' : 'text'} style={step.done ? { textDecorationLine: 'line-through' } : undefined}>
           {step.title}
         </Text>
