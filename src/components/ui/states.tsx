@@ -1,5 +1,6 @@
 import { ActivityIndicator, View } from 'react-native';
 
+import { useIsOnline } from '@/lib/online';
 import { useTheme } from '@/theme';
 import { Button } from './button';
 import { Icon, type IconName } from './icon';
@@ -15,11 +16,12 @@ export function LoadingView() {
 }
 
 export function ErrorView({ message, onRetry }: { message?: string; onRetry?: () => void }) {
+  const online = useIsOnline();
   return (
     <EmptyState
-      icon="cloud-offline-outline"
-      title="حدث خطأ"
-      body={message ?? 'تعذر تحميل البيانات'}
+      icon={online ? 'alert-circle-outline' : 'cloud-offline-outline'}
+      title={online ? 'حدث خطأ' : 'لا يوجد اتصال'}
+      body={online ? (message ?? 'تعذر تحميل البيانات') : 'تحقق من الإنترنت، وسنحدّث الصفحة تلقائيا عند عودته.'}
       action={onRetry ? { label: 'إعادة المحاولة', onPress: onRetry } : undefined}
     />
   );

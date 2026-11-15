@@ -5,6 +5,7 @@ export * from './card';
 export * from './chip';
 export * from './icon';
 export * from './list-row';
+export * from './offline-banner';
 export * from './progress-bar';
 export * from './screen';
 export * from './section-header';
