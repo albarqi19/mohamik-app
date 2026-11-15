@@ -1,5 +1,5 @@
 import { buildMockCases } from '@/api/mock/data';
-import { addManualDeadline, addManualHearing } from '@/api/mock/manual-dates';
+import { addManualDeadline, addManualHearing, applyNajizImport } from '@/api/mock/manual-dates';
 
 const get = (id: string) => buildMockCases().find((c) => c.id === id)!;
 const inDays = (n: number) => new Date(Date.now() + n * 86400000).toISOString();
@@ -33,5 +33,26 @@ describe('manual dates', () => {
     expect(c.stage).toBe('hearings');
     expect(c.nextHearingAt).toBe(h.scheduledAt);
     expect(c.nextSteps[0].action).toBe('prepare_hearing');
+  });
+});
+
+describe('najiz import apply', () => {
+  it('sets number and court, adds only new future hearings, moves to filed', () => {
+    const c0 = get('case-4');
+    const at = inDays(9);
+    const c = applyNajizImport(c0, {
+      caseNumber: '4470001111',
+      court: { name: 'محكمة التنفيذ بالرياض', city: 'الرياض' },
+      hearings: [
+        { scheduledAt: at, mode: 'remote' },
+        { scheduledAt: at, mode: 'remote' },
+        { scheduledAt: inDays(-3), mode: 'remote' },
+      ],
+    });
+    expect(c.caseNumber).toBe('4470001111');
+    expect(c.court?.name).toBe('محكمة التنفيذ بالرياض');
+    expect(c.hearings).toHaveLength(1);
+    expect(c.stage).toBe('hearings');
+    expect(c.timeline.at(-1)?.detail).toBe('أضيفت جلسة واحدة');
   });
 });

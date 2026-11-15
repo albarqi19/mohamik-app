@@ -5,7 +5,7 @@ import { memoKindLabels, stageLabels } from '@/features/labels';
 
 import { applyHearingOutcome } from './hearing-outcome';
 import { intakeNext } from './intake';
-import { addManualDeadline, addManualHearing } from './manual-dates';
+import { addManualDeadline, addManualHearing, applyNajizImport } from './manual-dates';
 import { buildMockCases, buildMockNotifications, citations } from './data';
 
 /** تطبيق تجريبي يعمل في الذاكرة، يحاكي زمن الشبكة. */
@@ -284,6 +284,10 @@ export const mockApi: Api = {
     async addDeadline(caseId, input) {
       await delay(300);
       return clone(addManualDeadline(findCase(caseId), input));
+    },
+    async applyNajizImport(caseId, input) {
+      await delay(400);
+      return clone(applyNajizImport(findCase(caseId), input));
     },
     async addHearing(caseId, input) {
       await delay(300);

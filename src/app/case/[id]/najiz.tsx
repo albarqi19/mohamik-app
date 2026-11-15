@@ -1,13 +1,12 @@
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { Button, Card, ErrorView, Icon, LoadingView, ProgressBar, Screen, SectionHeader, Text } from '@/components/ui';
 import { useCase } from '@/features/queries';
-import { filingStatement, filingSteps, NAJIZ_URL } from '@/features/najiz';
+import { filingStatement, filingSteps } from '@/features/najiz';
 import { useTheme } from '@/theme';
 
 export default function NajizGuideScreen() {
@@ -82,7 +81,19 @@ export default function NajizGuideScreen() {
         })}
       </View>
 
-      <Button title="افتح ناجز" variant="accent" icon="open-outline" onPress={() => Linking.openURL(NAJIZ_URL)} full />
+      <Button
+        title="افتح ناجز داخل التطبيق"
+        variant="accent"
+        icon="open-outline"
+        onPress={() => router.push({ pathname: '/case/[id]/najiz-connect', params: { id: c.id, mode: 'file' } })}
+        full
+      />
+      <Button
+        title="رفعتها؟ اقرأ رقم القضية والجلسات من ناجز"
+        variant="ghost"
+        icon="download-outline"
+        onPress={() => router.push({ pathname: '/case/[id]/najiz-connect', params: { id: c.id, mode: 'import' } })}
+      />
 
       <SectionHeader title="نص الدعوى الجاهز" />
       <Card style={{ gap: spacing.md }}>

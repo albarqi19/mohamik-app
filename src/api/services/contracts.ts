@@ -10,6 +10,7 @@ import type {
   DraftMemoInput,
   Hearing,
   HearingOutcomeInput,
+  NajizImportInput,
   NewDeadlineInput,
   NewHearingInput,
   ID,
@@ -50,6 +51,8 @@ export interface CasesService {
   recordHearingOutcome(caseId: ID, hearingId: ID, input: HearingOutcomeInput): Promise<Case>;
   addDeadline(caseId: ID, input: NewDeadlineInput): Promise<Case>;
   addHearing(caseId: ID, input: NewHearingInput): Promise<Case>;
+  /** يحفظ ما أكده المستخدم من بيانات ناجز. لا يرسل جلسة نفاذ ولا كوكيز. */
+  applyNajizImport(caseId: ID, input: NajizImportInput): Promise<Case>;
   deadlines(): Promise<Deadline[]>;
   /** لا تنبيه تصعيدي على مهلة غير مؤكدة: المستخدم يؤكدها هنا */
   confirmDeadline(caseId: ID, deadlineId: ID): Promise<Deadline>;

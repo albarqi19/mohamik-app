@@ -111,6 +111,7 @@ function RootNavigator() {
           <Stack.Screen name="privacy" options={{ title: 'الخصوصية وبياناتي' }} />
           <Stack.Screen name="case/[id]/najiz" options={{ title: 'رفع الدعوى في ناجز' }} />
           <Stack.Screen name="case/[id]/hearing-outcome" options={{ title: 'ما جرى في الجلسة', presentation: 'modal' }} />
+          <Stack.Screen name="case/[id]/najiz-connect" options={{ title: 'ناجز' }} />
           <Stack.Screen name="case/[id]/add-date" options={{ title: 'إضافة موعد', presentation: 'modal' }} />
         </Stack.Protected>
       </Stack>
